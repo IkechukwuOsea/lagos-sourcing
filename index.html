@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lagos Sourcing Platform - Working Base</title>
+<title>Lagos Sourcing Platform</title>
 <style>
   * { box-sizing: border-box; }
   body { margin:0; font-family: Arial, sans-serif; background:#F5F3EF; color:#1C1B18; }
@@ -81,7 +81,7 @@ window.addEventListener("unhandledrejection", function(e) {
   <div class="card p-6">
     <h1 class="text-2xl font-bold">Lagos Sourcing Platform</h1>
     <p class="text-sm text-slate-600 mt-2"><strong>Opening the app…</strong></p>
-    <p class="text-sm text-slate-600 mt-2">If this message does not change to the login screen, your current file preview is blocking JavaScript. Download the file to your device and open it directly in Chrome, Edge, Safari, or Firefox.</p>
+    <p class="text-sm text-slate-600 mt-2">If this message does not change to the login screen, a startup error will appear below with the exact problem.</p>
   </div>
 </div>
 <div id="startup-error" style="display:none;max-width:1000px;margin:16px auto;padding:16px;border:1px solid #fca5a5;background:#fef2f2;color:#7f1d1d;border-radius:12px">
@@ -102,53 +102,112 @@ window.addEventListener("unhandledrejection", function(e) {
 // log you out. It holds no secret — see the auth note in the UI.
 // ============================================================
 
-const USERS_KEY = "users";
-const SESSION_KEY = "session";
-const ORDERS_KEY = "orders";
+const USERS_KEY = "lagos_sourcing_users";
+const SESSION_KEY = "lagos_sourcing_session";
+const ORDERS_KEY = "lagos_sourcing_orders";
 
-async function getUsers() {
+// Browser-safe storage adapter. GitHub Pages and ordinary browsers do not
+// provide `window.storage`, so localStorage is the standalone fallback.
+function storageAvailable() {
+  return typeof window !== "undefined" && window.storage &&
+    typeof window.storage.get === "function" &&
+    typeof window.storage.set === "function";
+}
+
+function localGet(key) {
+  try { return window.localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function localSet(key, value) {
+  try { window.localStorage.setItem(key, value); return true; } catch (e) { return false; }
+}
+
+function localDelete(key) {
+  try { window.localStorage.removeItem(key); } catch (e) {}
+}
+
+function parseArray(value) {
   try {
-    const res = await window.storage.get(USERS_KEY, true);
-    return res && Array.isArray(JSON.parse(res.value)) ? JSON.parse(res.value) : [];
+    const parsed = value ? JSON.parse(value) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
     return [];
   }
+}
+
+async function getUsers() {
+  if (storageAvailable()) {
+    try {
+      const res = await window.storage.get(USERS_KEY, true);
+      if (res && typeof res.value === "string") return parseArray(res.value);
+    } catch (e) {
+      console.warn("Shared storage unavailable; using localStorage for users.", e);
+    }
+  }
+  return parseArray(localGet(USERS_KEY));
 }
 
 async function saveUsers(users) {
-  await window.storage.set(USERS_KEY, JSON.stringify(users), true);
+  const value = JSON.stringify(users);
+  if (storageAvailable()) {
+    try { await window.storage.set(USERS_KEY, value, true); return; }
+    catch (e) { console.warn("Shared storage save failed; using localStorage for users.", e); }
+  }
+  if (!localSet(USERS_KEY, value)) throw new Error("This browser could not save user data.");
 }
 
 async function getOrders() {
-  try {
-    const res = await window.storage.get(ORDERS_KEY, true);
-    return res && Array.isArray(JSON.parse(res.value)) ? JSON.parse(res.value) : [];
-  } catch (e) {
-    return [];
+  if (storageAvailable()) {
+    try {
+      const res = await window.storage.get(ORDERS_KEY, true);
+      if (res && typeof res.value === "string") return parseArray(res.value);
+    } catch (e) {
+      console.warn("Shared storage unavailable; using localStorage for orders.", e);
+    }
   }
+  return parseArray(localGet(ORDERS_KEY));
 }
 
 async function saveOrders(orders) {
-  await window.storage.set(ORDERS_KEY, JSON.stringify(orders), true);
+  const value = JSON.stringify(orders);
+  if (storageAvailable()) {
+    try { await window.storage.set(ORDERS_KEY, value, true); return; }
+    catch (e) { console.warn("Shared storage save failed; using localStorage for orders.", e); }
+  }
+  if (!localSet(ORDERS_KEY, value)) throw new Error("This browser could not save order data.");
 }
 
 async function getSession() {
+  if (storageAvailable()) {
+    try {
+      const res = await window.storage.get(SESSION_KEY, false);
+      if (res && typeof res.value === "string") return JSON.parse(res.value);
+    } catch (e) {
+      console.warn("Session storage unavailable; using localStorage.", e);
+    }
+  }
   try {
-    const res = await window.storage.get(SESSION_KEY, false);
-    return res ? JSON.parse(res.value) : null;
+    const value = localGet(SESSION_KEY);
+    return value ? JSON.parse(value) : null;
   } catch (e) {
     return null;
   }
 }
 
 async function saveSession(session) {
-  await window.storage.set(SESSION_KEY, JSON.stringify(session), false);
+  const value = JSON.stringify(session);
+  if (storageAvailable()) {
+    try { await window.storage.set(SESSION_KEY, value, false); return; }
+    catch (e) { console.warn("Session save failed; using localStorage.", e); }
+  }
+  if (!localSet(SESSION_KEY, value)) throw new Error("This browser could not save the session.");
 }
 
 async function clearSession() {
-  try {
-    await window.storage.delete(SESSION_KEY, false);
-  } catch (e) {}
+  if (storageAvailable()) {
+    try { await window.storage.delete(SESSION_KEY, false); } catch (e) {}
+  }
+  localDelete(SESSION_KEY);
 }
 
 // ============================================================
