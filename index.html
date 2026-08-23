@@ -18,9 +18,10 @@ textarea{resize:vertical}table{width:100%;border-collapse:collapse}th,td{padding
 .badge{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}.client{background:#E6F1FB;color:#0C447C}.vendor{background:#FAEEDA;color:#633806}.admin{background:#FCEBEB;color:#791F1F}
 .b-slate{background:#f1f5f9;color:#475569}.b-blue{background:#dbeafe;color:#1d4ed8}.b-green{background:#d1fae5;color:#047857}.b-amber{background:#fef3c7;color:#b45309}.b-orange{background:#ffedd5;color:#c2410c}.b-red{background:#fee2e2;color:#b91c1c}
 .notice{padding:12px;border-radius:8px;background:#ecfdf5;color:#065f46}.warn{padding:12px;border-radius:8px;background:#fffbeb;color:#92400e}.error{padding:12px;border-radius:8px;background:#fef2f2;color:#991b1b}
-.action{padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff}.danger{border-color:#fca5a5;color:#b91c1c}.redbtn{background:#dc2626;color:#fff;border:0}
-.verifyPending{background:#F59E0B;color:#fff;border-color:#D97706}.verifyPending:hover{background:#D97706}.verifyDone{background:#059669;color:#fff;border-color:#047857}.verifyDone:hover{background:#047857}.iconbtn{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1}.spin{display:inline-block;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.progressTrack{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden}.progressFill{height:100%;background:#059669;border-radius:999px}.tracking{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.stage{border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;border-radius:8px;padding:8px;text-align:center;font-size:11px;font-weight:600}.stage.done{border-color:#a7f3d0;background:#ecfdf5;color:#047857}.stage.active{border-color:#059669;background:#ecfdf5;color:#065f46}
+.action{padding:8px 12px;border-radius:8px;border:1px solid #9F998C;background:#D8D3C8;color:#14312B;font-weight:600;transition:background .18s ease,border-color .18s ease,transform .18s ease}.action:hover{background:#C9C3B6;border-color:#80796B}.action:active{transform:translateY(1px)}.btn-primary,.btn-primary.action{background:#14312B;color:#F5F3EF;border-color:#14312B}.btn-primary:hover,.btn-primary.action:hover{background:#0B241F;border-color:#0B241F}.danger{border-color:#ef4444;background:#FEE2E2;color:#991B1B}.danger:hover{background:#FECACA}.redbtn{background:#B91C1C;color:#fff;border:1px solid #991B1B}.redbtn:hover{background:#991B1B}
+.verifyPending{background:#A84F08;color:#fff;border-color:#7C3A06}.verifyPending:hover{background:#7C3A06}.verifyDone{background:#047857;color:#fff;border-color:#065F46}.verifyDone:hover{background:#065F46}.iconbtn{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1}.spin{display:inline-block;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.progressTrack{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden}.progressFill{height:100%;background:#059669;border-radius:999px}.tracking{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.stage{border:1px solid #cbd5e1;background:#E8E5DE;color:#475569;border-radius:8px;padding:8px;text-align:center;font-size:11px;font-weight:700}.stage.done{border-color:#6EE7B7;background:#D1FAE5;color:#065F46}.stage.active{border-color:#047857;background:#A7F3D0;color:#064E3B}
+.flowDetails{background:#fff;border:1px solid #DAD5CA;border-radius:12px;overflow:hidden}.flowSummary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;cursor:pointer;background:#F3F0EA;user-select:none}.flowSummary::-webkit-details-marker{display:none}.flowSummary:hover{background:#E8E3D9}.flowTitle{display:flex;align-items:center;gap:10px;min-width:0}.flowStatus{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:#14312B;color:#fff;white-space:nowrap}.flowChevron{font-size:20px;font-weight:700;color:#14312B;transition:transform .2s ease}.flowDetails[open] .flowChevron{transform:rotate(180deg)}.flowBody{padding:16px;border-top:1px solid #E7E3DA}.flowActions{display:flex;justify-content:flex-end;margin-bottom:12px}
 @media(max-width:760px){.g2,.g3{grid-template-columns:1fr}.tracking{grid-template-columns:repeat(2,minmax(0,1fr))}table{font-size:12px}.hideMobile{display:none}}
 </style>
 <script>
@@ -569,12 +570,18 @@ function renderInvoice(o,vendor,client){
 function renderTracking(o){
   const stages=[["requested","Request"],["invoiced","Quote"],["escrow_funded","Escrow"],["sourcing","Sourcing"],["shipped","Shipped"],["in_transit","In transit"],["completed","Completed"]];
   const rank={requested:0,invoiced:1,escrow_funded:3,shipped:4,in_transit:5,completed:6,disputed:5,refunded:6,declined:-1,cancelled:-1};
+  const labels={requested:"Request sent",invoiced:"Quote ready",escrow_funded:"Sourcing",shipped:"Shipped",in_transit:"In transit",completed:"Completed",disputed:"Disputed",refunded:"Refunded",declined:"Declined",cancelled:"Cancelled"};
   const current=rank[o.status]??0;
-  return `<div class="card p16 mt16"><div class="flex between center mb12"><b class="text14">Goods Flow</b><button class="action small" onclick="printOrderReceipt('${o.id}')">Print receipt</button></div>
+  const flowBody=`<div class="flowActions"><button class="action small" onclick="printOrderReceipt('${o.id}')">Print receipt</button></div>
     <div class="tracking">${stages.map(([k,label],i)=>{const active=(o.status==="escrow_funded"&&k==="sourcing")||o.status===k;const done=current>i||(o.status==="escrow_funded"&&i<=2);return `<div class="stage ${active?"active":done?"done":""}">${done&&!active?"✓ ":""}${label}</div>`}).join("")}</div>
     ${o.shipment?`<div class="small muted mt12"><b>Carrier:</b> ${escapeHtml(o.shipment.carrier||"—")} &nbsp; <b>Tracking:</b> ${escapeHtml(o.shipment.tracking_number||"—")}</div>`:""}
-    ${o.shipmentProof?`<div class="small muted mt8"><b>Shipment details:</b> ${escapeHtml(o.shipmentProof)}</div>`:""}
-  </div>`;
+    ${o.shipmentProof?`<div class="small muted mt8"><b>Shipment details:</b> ${escapeHtml(o.shipmentProof)}</div>`:""}`;
+
+  if(state.currentUser&&state.currentUser.role==="client"){
+    return `<details class="flowDetails mt16"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><span class="flowChevron">⌄</span></summary><div class="flowBody">${flowBody}</div></details>`;
+  }
+
+  return `<div class="card p16 mt16"><div class="flex between center mb12"><b class="text14">Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div>${flowBody}</div>`;
 }
 function printOrderReceipt(id){
   const o=state.orders.find(x=>x.id===id);if(!o)return;const c=userById(o.clientId),v=userById(o.vendorId);
