@@ -84,6 +84,7 @@ import {
   browserSessionPersistence,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -93,9 +94,9 @@ import {
   doc,
   getDoc,
   getDocs,
-  addDoc,
   setDoc,
   updateDoc,
+  writeBatch,
   query,
   where,
   serverTimestamp,
@@ -125,7 +126,8 @@ let state = {
   invoicingOrderId: null, invoiceError: "",
   shippingOrderId: null, shipError: "",
   disputingOrderId: null, disputeError: "",
-  searchQuery: "", searchResults: null
+  searchQuery: "", searchResults: null,
+  relatedByOrder: {}, relatedLoaded: new Set(), relatedLoading: new Set(), openFlowIds: new Set()
 };
 
 function escapeHtml(v){const d=document.createElement("div");d.textContent=v==null?"":String(v);return d.innerHTML}
@@ -165,10 +167,13 @@ function profileToUser(id,p){
   };
 }
 
-function mapOrder(id,row,history,shipment,dispute){
+function mapOrder(id,row,related){
+  const shipment=related&&related.shipment?related.shipment:null;
+  const dispute=related&&related.dispute?related.dispute:null;
   return {
     id,
     clientId:row.clientId,
+    clientName:row.clientName||"",
     vendorId:row.vendorId,
     itemDesc:row.itemDesc||"",
     market:row.market||"",
@@ -187,7 +192,6 @@ function mapOrder(id,row,history,shipment,dispute){
     cancellationReason:row.cancellationReason||"",
     autoReleased:!!row.autoReleased,
     createdAt:row.createdAt||null,
-    statusHistory:(history||[]).map(h=>({status:h.status,at:h.createdAt})),
     shipment:shipment?{
       carrier:shipment.carrier||"",
       tracking_number:shipment.trackingNumber||"",
@@ -241,32 +245,69 @@ async function getOrdersForRole(current){
   });
 }
 
-async function loadRelated(orderId){
-  const [hs,ss,ds]=await Promise.all([
-    getDocs(query(collection(db,"orderHistory"),where("orderId","==",orderId))),
-    getDocs(query(collection(db,"shipments"),where("orderId","==",orderId))),
-    getDocs(query(collection(db,"disputes"),where("orderId","==",orderId)))
+function resetRelatedCache(){
+  state.relatedByOrder={};
+  state.relatedLoaded=new Set();
+  state.relatedLoading=new Set();
+  state.openFlowIds=new Set();
+}
+
+async function loadOrderRelated(orderId,status){
+  const needsShipment=["shipped","in_transit","completed","disputed","refunded"].includes(status);
+  const needsDispute=["disputed","refunded"].includes(status);
+  const [shipmentSnap,disputeSnap]=await Promise.all([
+    needsShipment?getDoc(doc(db,"shipments",orderId)):Promise.resolve(null),
+    needsDispute?getDoc(doc(db,"disputes",orderId)):Promise.resolve(null)
   ]);
-  const history=hs.docs.map(d=>d.data()).sort((a,b)=>(asDate(a.createdAt)?.getTime()||0)-(asDate(b.createdAt)?.getTime()||0));
-  const shipment=ss.docs[0]?ss.docs[0].data():null;
-  const dispute=ds.docs[0]?ds.docs[0].data():null;
-  return {history,shipment,dispute};
+  const related={
+    shipment:shipmentSnap&&shipmentSnap.exists()?shipmentSnap.data():null,
+    dispute:disputeSnap&&disputeSnap.exists()?disputeSnap.data():null
+  };
+  state.relatedByOrder[orderId]=related;
+  state.relatedLoaded.add(orderId);
+  const order=state.orders.find(o=>o.id===orderId);
+  if(order){
+    const refreshed=mapOrder(orderId,order,related);
+    Object.assign(order,refreshed);
+  }
+  return related;
+}
+
+async function prefetchRelatedForRole(current,baseOrders){
+  if(current.role==="client") return;
+  const ids=baseOrders.filter(o=>{
+    if(current.role==="admin") return o.status==="disputed";
+    return ["shipped","in_transit","completed","disputed","refunded"].includes(o.status);
+  }).map(o=>o.id);
+  await Promise.all(ids.map(id=>{const order=baseOrders.find(o=>o.id===id);return loadOrderRelated(id,order?order.status:"")}));
+}
+
+async function loadDataForUser(user){
+  const current=await getOwnProfile(user.uid);
+  const [profiles,baseOrders]=await Promise.all([
+    getProfilesForRole(current),
+    getOrdersForRole(current)
+  ]);
+  state.currentUser=current;
+  state.sessionUser=user;
+  state.users=profiles;
+  await prefetchRelatedForRole(current,baseOrders);
+  state.orders=baseOrders.map(o=>mapOrder(o.id,o,state.relatedByOrder[o.id]||null));
 }
 
 async function loadData(){
-  if(!auth.currentUser) return;
-  const current=await getOwnProfile(auth.currentUser.uid);
-  state.currentUser=current;
-  state.sessionUser=auth.currentUser;
-  state.users=await getProfilesForRole(current);
-  const baseOrders=await getOrdersForRole(current);
-  const related=await Promise.all(baseOrders.map(o=>loadRelated(o.id)));
-  state.orders=baseOrders.map((o,i)=>mapOrder(o.id,o,related[i].history,related[i].shipment,related[i].dispute));
+  const user=auth.currentUser;
+  if(!user) return;
+  await loadDataForUser(user);
 }
 
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 let idleTimer = null;
 let lastActivityAt = Date.now();
+let actionLock = false;
+let authGeneration = 0;
+let pendingAuthError = "";
+let pendingProfileBootstrap = null;
 
 function clearSensitiveAuthFields(){
   ["li-password","su-password"].forEach(id=>{
@@ -284,6 +325,8 @@ function scheduleSensitiveFieldClear(){
 async function autoLogoutForInactivity(){
   if(!auth.currentUser) return;
   try{await signOut(auth)}catch(e){console.warn(e)}
+  clearTimeout(idleTimer);
+  resetRelatedCache();
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";
   state.notice="You were signed out after 15 minutes of inactivity.";
@@ -318,28 +361,57 @@ window.addEventListener("pageshow",()=>{
   if(!auth.currentUser) scheduleSensitiveFieldClear();
 });
 
+function newProfileBootstrap(){
+  let resolve;
+  const promise=new Promise(r=>{resolve=r});
+  const bootstrap={uid:null,promise,resolve};
+  pendingProfileBootstrap=bootstrap;
+  return bootstrap;
+}
+
 async function init(){
   try{
     await setPersistence(auth,browserSessionPersistence);
     onAuthStateChanged(auth,async user=>{
-      try{
-        if(user){
-          state.sessionUser=user;
-          await loadData();
-          state.view="dashboard";
-          lastActivityAt=Date.now();
-          armIdleTimer();
-        }else{
-          clearTimeout(idleTimer);
-          state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
-          state.view="auth";
-        }
-        state.error="";
-      }catch(e){
+      const generation=++authGeneration;
+      if(!user){
+        clearTimeout(idleTimer);
+        resetRelatedCache();
+        state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
         state.view="auth";
-        state.error=friendlyError(e);
+        state.loadingAction=false;
+        state.error=pendingAuthError||"";
+        pendingAuthError="";
+        render();
+        return;
       }
-      render();
+      try{
+        const bootstrap=pendingProfileBootstrap;
+        if(bootstrap&&(!bootstrap.uid||bootstrap.uid===user.uid)){
+          const result=await bootstrap.promise;
+          if(!result.ok) throw result.error;
+        }
+        if(generation!==authGeneration||!auth.currentUser||auth.currentUser.uid!==user.uid) return;
+        resetRelatedCache();
+        await loadDataForUser(user);
+        if(generation!==authGeneration||!auth.currentUser||auth.currentUser.uid!==user.uid) return;
+        state.view="dashboard";
+        state.error="";
+        state.loadingAction=false;
+        lastActivityAt=Date.now();
+        armIdleTimer();
+        render();
+      }catch(e){
+        if(generation!==authGeneration) return;
+        pendingAuthError=friendlyError(e);
+        try{await signOut(auth)}catch(signOutError){
+          console.warn(signOutError);
+          resetRelatedCache();
+          state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+          state.view="auth";state.loadingAction=false;state.error=pendingAuthError;pendingAuthError="";
+          render();
+        }
+      }
     });
   }catch(e){
     state.view="auth";
@@ -349,17 +421,22 @@ async function init(){
 }
 
 async function refreshData(){
-  if(!auth.currentUser)return;
-  state.loadingAction=true;state.error="";render();
-  try{await loadData()}catch(e){state.error=friendlyError(e)}
-  state.loadingAction=false;render();
+  if(!auth.currentUser||actionLock)return;
+  actionLock=true;state.loadingAction=true;state.error="";render();
+  try{
+    resetRelatedCache();
+    await loadData();
+  }catch(e){state.error=friendlyError(e)}
+  actionLock=false;state.loadingAction=false;render();
 }
 
 function switchAuthMode(mode){state.authMode=mode;state.error="";state.notice="";render()}
 function switchAuthRole(role){state.authRole=role;state.error="";render()}
 
 async function handleSignup(e){
-  e.preventDefault();state.error="";state.notice="";
+  e.preventDefault();
+  if(state.loadingAction)return;
+  state.error="";state.notice="";
   const name=document.getElementById("su-name").value.trim();
   const email=document.getElementById("su-email").value.trim();
   const phone=document.getElementById("su-phone").value.trim();
@@ -370,8 +447,11 @@ async function handleSignup(e){
   if(!name||!email||!password){state.error="Enter your name, email and password.";render();return}
   if(password.length<8){state.error="Use a password with at least 8 characters.";render();return}
   state.loadingAction=true;render();
+  const bootstrap=newProfileBootstrap();
+  let cred=null;
   try{
-    const cred=await createUserWithEmailAndPassword(auth,email,password);
+    cred=await createUserWithEmailAndPassword(auth,email,password);
+    bootstrap.uid=cred.user.uid;
     const profile={
       fullName:name,
       role:state.authRole,
@@ -386,45 +466,59 @@ async function handleSignup(e){
       profile.categories=categories;
     }
     await setDoc(doc(db,"users",cred.user.uid),profile);
-    state.sessionUser=cred.user;
-    await loadData();
-    state.view="dashboard";
-    lastActivityAt=Date.now();
-    armIdleTimer();
     state.notice=state.authRole==="vendor"?"Account created. An admin must verify your vendor profile before clients can see it.":"Account created successfully.";
+    bootstrap.resolve({ok:true});
+    if(pendingProfileBootstrap===bootstrap) pendingProfileBootstrap=null;
   }catch(e){
-    state.error=friendlyError(e);
+    const originalError=e;
+    if(cred&&cred.user){
+      try{await deleteUser(cred.user)}catch(deleteError){
+        console.warn("Could not roll back incomplete signup",deleteError);
+        try{await signOut(auth)}catch(signOutError){console.warn(signOutError)}
+      }
+    }
+    bootstrap.resolve({ok:false,error:originalError});
+    if(pendingProfileBootstrap===bootstrap) pendingProfileBootstrap=null;
+    state.loadingAction=false;
+    state.view="auth";
+    state.error=friendlyError(originalError)+" The incomplete signup was rolled back; please try again.";
+    render();
+    scheduleSensitiveFieldClear();
+    return;
   }
-  state.loadingAction=false;render();
+  state.loadingAction=false;
 }
 
 async function handleLogin(e){
-  e.preventDefault();state.error="";state.notice="";
+  e.preventDefault();
+  if(state.loadingAction)return;
+  state.error="";state.notice="";
   const email=document.getElementById("li-email").value.trim();
   const password=document.getElementById("li-password").value;
   if(!email||!password){state.error="Enter your email and password.";render();return}
   state.loadingAction=true;render();
   try{
-    const cred=await signInWithEmailAndPassword(auth,email,password);
-    state.sessionUser=cred.user;
-    await loadData();
-    state.view="dashboard";
-    lastActivityAt=Date.now();
-    armIdleTimer();
-  }catch(e){state.error=friendlyError(e)}
-  state.loadingAction=false;render();
+    await signInWithEmailAndPassword(auth,email,password);
+  }catch(e){
+    state.loadingAction=false;
+    state.error=friendlyError(e);
+    render();
+    scheduleSensitiveFieldClear();
+  }
 }
 
 async function handleLogout(){
   clearTimeout(idleTimer);
   try{await signOut(auth)}catch(e){console.warn(e)}
+  resetRelatedCache();
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
-  state.view="auth";state.authMode="login";state.error="";state.notice="";render();
+  state.view="auth";state.authMode="login";state.error="";state.notice="";state.loadingAction=false;render();
   scheduleSensitiveFieldClear();
 }
 
-async function addHistory(orderId,status){
-  await addDoc(collection(db,"orderHistory"),{
+function queueHistory(batch,orderId,status){
+  const historyRef=doc(collection(db,"orderHistory"));
+  batch.set(historyRef,{
     orderId,
     status,
     actorId:auth.currentUser.uid,
@@ -433,15 +527,18 @@ async function addHistory(orderId,status){
 }
 
 async function runAction(work, fallbackStateKey){
+  if(actionLock)return;
+  actionLock=true;
   state.error="";if(fallbackStateKey)state[fallbackStateKey]="";state.loadingAction=true;render();
   try{
     await work();
+    resetRelatedCache();
     await loadData();
   }catch(e){
     if(fallbackStateKey)state[fallbackStateKey]=friendlyError(e);
     else state.error=friendlyError(e);
   }
-  state.loadingAction=false;render();
+  actionLock=false;state.loadingAction=false;render();
 }
 
 async function toggleVendorVerified(id){
@@ -475,18 +572,23 @@ async function submitRequest(e){
   if(!item){state.requestError="Describe the item you want.";render();return}
   const vendorId=state.requestingVendorId;
   const vendor=userById(vendorId);
+  if(!vendor){state.requestError="That vendor is no longer available.";render();return}
   await runAction(async()=>{
-    const ref=await addDoc(collection(db,"orders"),{
+    const batch=writeBatch(db);
+    const orderRef=doc(collection(db,"orders"));
+    batch.set(orderRef,{
       clientId:auth.currentUser.uid,
+      clientName:state.currentUser?state.currentUser.name:"Client",
       vendorId,
       itemDesc:item,
-      market:vendor?vendor.market:"",
+      market:vendor.market||"",
       status:"requested",
       autoReleased:false,
       createdAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(ref.id,"requested");
+    queueHistory(batch,orderRef.id,"requested");
+    await batch.commit();
     state.requestingVendorId=null;
   },"requestError");
 }
@@ -501,8 +603,9 @@ async function submitInvoice(e){
   if(!Number.isFinite(delivery)||delivery<0){state.invoiceError="Enter a valid delivery cost.";render();return}
   const id=state.invoicingOrderId;
   await runAction(async()=>{
+    const batch=writeBatch(db);
     const invoice="INV-"+crypto.randomUUID().replace(/-/g,"").slice(0,8).toUpperCase();
-    await updateDoc(doc(db,"orders",id),{
+    batch.update(doc(db,"orders",id),{
       status:"invoiced",
       itemCost:item,
       deliveryCost:delivery,
@@ -511,7 +614,8 @@ async function submitInvoice(e){
       invoicedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"invoiced");
+    queueHistory(batch,id,"invoiced");
+    await batch.commit();
     state.invoicingOrderId=null;
   },"invoiceError");
 }
@@ -519,33 +623,39 @@ async function submitInvoice(e){
 async function declineRequest(id){
   if(!confirm("Decline this sourcing request?"))return;
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{status:"declined",updatedAt:serverTimestamp()});
-    await addHistory(id,"declined");
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{status:"declined",updatedAt:serverTimestamp()});
+    queueHistory(batch,id,"declined");
+    await batch.commit();
   });
 }
 
 async function cancelOrder(id){
   if(!confirm("Cancel this order before escrow funding?"))return;
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{
       status:"cancelled",
       cancelledAt:serverTimestamp(),
       cancellationReason:"Cancelled by client",
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"cancelled");
+    queueHistory(batch,id,"cancelled");
+    await batch.commit();
   });
 }
 
 async function fundEscrow(id){
   if(!confirm("This is still a SIMULATED escrow action. Continue for testing?"))return;
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{
       status:"escrow_funded",
       escrowFundedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"escrow_funded");
+    queueHistory(batch,id,"escrow_funded");
+    await batch.commit();
   });
 }
 
@@ -559,17 +669,18 @@ async function submitShipment(e){
   if(!carrier&&!tracking&&!notes){state.shipError="Enter carrier, tracking number, or shipment notes.";render();return}
   const id=state.shippingOrderId;
   await runAction(async()=>{
+    const batch=writeBatch(db);
     const parts=[];
     if(carrier)parts.push("Carrier: "+carrier);
     if(tracking)parts.push("Tracking: "+tracking);
     if(notes)parts.push(notes);
-    await updateDoc(doc(db,"orders",id),{
+    batch.update(doc(db,"orders",id),{
       status:"shipped",
       shipmentProof:parts.join(" | "),
       shippedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await setDoc(doc(db,"shipments",id),{
+    batch.set(doc(db,"shipments",id),{
       orderId:id,
       vendorId:auth.currentUser.uid,
       carrier,
@@ -579,35 +690,42 @@ async function submitShipment(e){
       createdAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"shipped");
+    queueHistory(batch,id,"shipped");
+    await batch.commit();
     state.shippingOrderId=null;
   },"shipError");
 }
 
 async function markInTransit(id){
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{
       status:"in_transit",
       inTransitAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await updateDoc(doc(db,"shipments",id),{
+    batch.set(doc(db,"shipments",id),{
+      orderId:id,
+      vendorId:auth.currentUser.uid,
       inTransitAt:serverTimestamp(),
       updatedAt:serverTimestamp()
-    });
-    await addHistory(id,"in_transit");
+    },{merge:true});
+    queueHistory(batch,id,"in_transit");
+    await batch.commit();
   });
 }
 
 async function confirmReceipt(id){
   if(!confirm("Confirm that you received this order?"))return;
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{
       status:"completed",
       completedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"completed");
+    queueHistory(batch,id,"completed");
+    await batch.commit();
   });
 }
 
@@ -619,8 +737,9 @@ async function submitDispute(e){
   if(!reason){state.disputeError="Explain what went wrong.";render();return}
   const id=state.disputingOrderId;
   await runAction(async()=>{
-    await updateDoc(doc(db,"orders",id),{status:"disputed",updatedAt:serverTimestamp()});
-    await setDoc(doc(db,"disputes",id),{
+    const batch=writeBatch(db);
+    batch.update(doc(db,"orders",id),{status:"disputed",updatedAt:serverTimestamp()});
+    batch.set(doc(db,"disputes",id),{
       orderId:id,
       raisedBy:auth.currentUser.uid,
       reason,
@@ -628,7 +747,8 @@ async function submitDispute(e){
       createdAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,"disputed");
+    queueHistory(batch,id,"disputed");
+    await batch.commit();
     state.disputingOrderId=null;
   },"disputeError");
 }
@@ -638,17 +758,19 @@ async function resolveDispute(id,resolution){
   const notes=el?el.value.trim():"";
   if(!confirm(resolution==="release"?"Release the order to the vendor?":"Resolve in the client's favour?"))return;
   await runAction(async()=>{
+    const batch=writeBatch(db);
     const orderUpdate={status:resolution==="release"?"completed":"refunded",updatedAt:serverTimestamp()};
     if(resolution==="release")orderUpdate.completedAt=serverTimestamp();
-    await updateDoc(doc(db,"orders",id),orderUpdate);
-    await updateDoc(doc(db,"disputes",id),{
+    batch.update(doc(db,"orders",id),orderUpdate);
+    batch.update(doc(db,"disputes",id),{
       status:"resolved",
       resolution,
       adminNotes:notes,
       resolvedAt:serverTimestamp(),
       updatedAt:serverTimestamp()
     });
-    await addHistory(id,orderUpdate.status);
+    queueHistory(batch,id,orderUpdate.status);
+    await batch.commit();
   });
 }
 
@@ -677,9 +799,10 @@ function flowIcon(key){
 
 function renderInvoice(o,vendor,client){
   if(o.itemCost==null)return "";
+  const clientLabel=client?client.name:(o.clientName||"Unknown");
   return `<div class="invoicePanel">
     <div class="invoiceHead"><div><div class="invoiceLabel">INVOICE</div><div class="mono invoiceNo">${escapeHtml(o.invoiceNumber||"")}</div></div><div class="small faint">${displayDate(o.invoicedAt)}</div></div>
-    <div class="invoiceParties">Vendor: ${escapeHtml(vendor?(vendor.businessName||vendor.name):"Unknown")}<br>Client: ${escapeHtml(client?client.name:"Unknown")}</div>
+    <div class="invoiceParties">Vendor: ${escapeHtml(vendor?(vendor.businessName||vendor.name):"Unknown")}<br>Client: ${escapeHtml(clientLabel)}</div>
     <div class="invoiceTotals">
       <div class="invoiceLine"><span>Item cost</span><b>${formatNaira(o.itemCost)}</b></div>
       <div class="invoiceLine"><span>Delivery</span><b>${formatNaira(o.deliveryCost)}</b></div>
@@ -698,8 +821,10 @@ function renderTracking(o){
   }).join("");
   const carrier=o.shipment&&o.shipment.carrier?o.shipment.carrier:"—";
   const tracking=o.shipment&&o.shipment.tracking_number?o.shipment.tracking_number:"—";
+  const loading=state.relatedLoading.has(o.id);
   const flowBody=`<div class="flowHead"><div class="flowHeadTitle">Track your order</div><button class="action receiptBtn" onclick="printOrderReceipt('${o.id}')">▣ &nbsp; Print receipt</button></div>
     <div class="flowTimelineWrap"><div class="flowTimeline">${nodes}</div></div>
+    ${loading?`<div class="shipmentNote"><b>Loading shipment details…</b></div>`:""}
     ${o.shipmentProof?`<div class="shipmentNote"><b>Shipment details:</b> ${escapeHtml(o.shipmentProof)}</div>`:""}
     <div class="flowMeta">
       <div class="flowMetaItem"><div class="metaIcon">◉</div><div><div class="metaLabel">Carrier</div><div class="metaValue">${escapeHtml(carrier)}</div></div></div>
@@ -708,13 +833,31 @@ function renderTracking(o){
     </div>`;
 
   if(state.currentUser&&state.currentUser.role==="client"){
-    return `<details class="flowDetails"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
+    const isOpen=state.openFlowIds.has(o.id);
+    return `<details class="flowDetails" ${isOpen?"open":""} ontoggle="handleFlowToggle(event,'${o.id}')"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
   }
   return `<div class="flowCard mt16"><div class="flowBody" style="border-top:0">${flowBody}</div></div>`;
 }
+
+async function handleFlowToggle(event,id){
+  if(!state.currentUser||state.currentUser.role!=="client")return;
+  if(!event.currentTarget.open){state.openFlowIds.delete(id);return}
+  state.openFlowIds.add(id);
+  if(state.relatedLoaded.has(id)||state.relatedLoading.has(id))return;
+  state.relatedLoading.add(id);
+  try{
+    const order=state.orders.find(o=>o.id===id);
+    await loadOrderRelated(id,order?order.status:"");
+  }catch(e){
+    state.error=friendlyError(e);
+  }
+  state.relatedLoading.delete(id);
+  render();
+}
+
 function printOrderReceipt(id){
   const o=state.orders.find(x=>x.id===id);if(!o)return;const c=userById(o.clientId),v=userById(o.vendorId);
-  const body=`<!doctype html><html><head><meta charset="utf-8"><title>Receipt ${escapeHtml(o.id)}</title><style>body{font-family:Arial;padding:32px;color:#222}table{width:100%;border-collapse:collapse}td{padding:9px;border-bottom:1px solid #ddd}.total{font-size:18px;font-weight:bold}</style></head><body><h1>Lagos Sourcing — Order Receipt</h1><p><b>Order:</b> ${escapeHtml(o.id)}</p><p><b>Date:</b> ${displayDateTime(o.createdAt)}</p><table><tr><td>Client</td><td>${escapeHtml(c?c.name:"Unknown")}</td></tr><tr><td>Vendor</td><td>${escapeHtml(v?(v.businessName||v.name):"Unknown")}</td></tr><tr><td>Item</td><td>${escapeHtml(o.itemDesc)}</td></tr><tr><td>Status</td><td>${escapeHtml(o.status)}</td></tr>${o.itemCost!=null?`<tr><td>Item cost</td><td>${formatNaira(o.itemCost)}</td></tr><tr><td>Delivery</td><td>${formatNaira(o.deliveryCost)}</td></tr><tr class="total"><td>Total</td><td>${formatNaira(o.totalCost)}</td></tr>`:""}${o.shipmentProof?`<tr><td>Shipment</td><td>${escapeHtml(o.shipmentProof)}</td></tr>`:""}</table><p style="margin-top:24px;font-size:12px;color:#666">Payment/escrow is still simulated in this development version.</p><script>window.onload=()=>window.print();<\/script></body></html>`;
+  const body=`<!doctype html><html><head><meta charset="utf-8"><title>Receipt ${escapeHtml(o.id)}</title><style>body{font-family:Arial;padding:32px;color:#222}table{width:100%;border-collapse:collapse}td{padding:9px;border-bottom:1px solid #ddd}.total{font-size:18px;font-weight:bold}</style></head><body><h1>Lagos Sourcing — Order Receipt</h1><p><b>Order:</b> ${escapeHtml(o.id)}</p><p><b>Date:</b> ${displayDateTime(o.createdAt)}</p><table><tr><td>Client</td><td>${escapeHtml(c?c.name:(o.clientName||"Unknown"))}</td></tr><tr><td>Vendor</td><td>${escapeHtml(v?(v.businessName||v.name):"Unknown")}</td></tr><tr><td>Item</td><td>${escapeHtml(o.itemDesc)}</td></tr><tr><td>Status</td><td>${escapeHtml(o.status)}</td></tr>${o.itemCost!=null?`<tr><td>Item cost</td><td>${formatNaira(o.itemCost)}</td></tr><tr><td>Delivery</td><td>${formatNaira(o.deliveryCost)}</td></tr><tr class="total"><td>Total</td><td>${formatNaira(o.totalCost)}</td></tr>`:""}${o.shipmentProof?`<tr><td>Shipment</td><td>${escapeHtml(o.shipmentProof)}</td></tr>`:""}</table><p style="margin-top:24px;font-size:12px;color:#666">Payment/escrow is still simulated in this development version.</p><script>window.onload=()=>window.print();<\/script></body></html>`;
   const w=window.open("","_blank","width=800,height=900");if(!w){alert("Allow pop-ups to print.");return}w.document.write(body);w.document.close();
 }
 
@@ -772,8 +915,8 @@ function renderClientPanels(u){
 function renderVendorPanels(u){
   if(!u.verified)return `<div class="card p24 centerText"><h3>Awaiting admin verification</h3><p class="muted">Your account works, but clients will only see your vendor profile after an admin verifies it.</p></div>`;
   const my=state.orders.filter(o=>o.vendorId===u.id),requested=my.filter(o=>o.status==="requested"),others=my.filter(o=>o.status!=="requested");
-  const newRows=requested.length?requested.map(o=>{const c=userById(o.clientId),open=state.invoicingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">From ${escapeHtml(c?c.name:"Client")}</div></div>${statusBadge(o.status)}</div>${open?`<form onsubmit="submitInvoice(event)" class="grid g2 mt12"><div><label class="small">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0" step="0.01"></div><div><label class="small">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01"></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="flex gap8" style="grid-column:1/-1"><button class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<div class="flex gap8 mt12"><button class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button class="action" onclick="declineRequest('${o.id}')">Decline</button></div>`}</div>`}).join(""):`<div class="muted text14">No new requests.</div>`;
-  const rows=others.length?others.map(o=>{const c=userById(o.clientId),ship=state.shippingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">${escapeHtml(c?c.name:"Client")}</div></div>${statusBadge(o.status)}</div>${renderInvoice(o,u,c)}
+  const newRows=requested.length?requested.map(o=>{const c=userById(o.clientId),open=state.invoicingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">From ${escapeHtml(c?c.name:(o.clientName||"Client"))}</div></div>${statusBadge(o.status)}</div>${open?`<form onsubmit="submitInvoice(event)" class="grid g2 mt12"><div><label class="small">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0" step="0.01"></div><div><label class="small">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01"></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="flex gap8" style="grid-column:1/-1"><button class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<div class="flex gap8 mt12"><button class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button class="action" onclick="declineRequest('${o.id}')">Decline</button></div>`}</div>`}).join(""):`<div class="muted text14">No new requests.</div>`;
+  const rows=others.length?others.map(o=>{const c=userById(o.clientId),ship=state.shippingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">${escapeHtml(c?c.name:(o.clientName||"Client"))}</div></div>${statusBadge(o.status)}</div>${renderInvoice(o,u,c)}
     ${o.status==="invoiced"?`<div class="muted text14 mt12">Waiting for the client to fund escrow.</div>`:""}
     ${o.status==="escrow_funded"?(ship?`<form onsubmit="submitShipment(event)" class="grid mt12"><div><label class="small">Carrier</label><input id="ship-carrier" placeholder="Courier/company"></div><div><label class="small">Tracking number</label><input id="ship-tracking" placeholder="Tracking number"></div><div><label class="small">Shipment notes</label><textarea id="ship-notes" rows="2"></textarea></div>${state.shipError?`<div class="error">${escapeHtml(state.shipError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Mark shipped</button><button type="button" class="action" onclick="closeShipForm()">Close</button></div></form>`:`<button class="btn-primary action mt12" onclick="openShipForm('${o.id}')">Log shipment</button>`):""}
     ${o.status==="shipped"?`<button class="action mt12" onclick="markInTransit('${o.id}')">Mark in transit</button>`:""}
@@ -817,7 +960,7 @@ Object.assign(window,{
   toggleVendorVerified,runVendorSearch,clearVendorSearch,openRequestForm,closeRequestForm,
   submitRequest,openInvoiceForm,closeInvoiceForm,submitInvoice,declineRequest,cancelOrder,
   fundEscrow,openShipForm,closeShipForm,submitShipment,markInTransit,confirmReceipt,
-  openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt
+  openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt,handleFlowToggle
 });
 
 init();
