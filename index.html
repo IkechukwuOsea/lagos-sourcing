@@ -56,7 +56,7 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 .invoicePanel{margin-top:16px;background:#f7faf9;border:1px solid #dfe7e3;border-radius:15px;padding:18px;box-shadow:none}.invoiceHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.invoiceLabel{font-size:12px;color:#8896a6;letter-spacing:.04em}.invoiceNo{font-size:17px;font-weight:800;margin-top:3px}.invoiceParties{font-size:13px;color:#6f7f90;margin-top:10px}.invoiceTotals{border-top:1px solid #dfe7e3;margin-top:14px;padding-top:12px;font-size:14px}.invoiceLine{display:flex;justify-content:space-between;gap:12px;margin-top:7px}.invoiceLine.total{font-weight:800;font-size:15px;margin-top:10px}
 
 .flowDetails,.flowCard{background:#fff;border:1px solid #dfe7e3;border-radius:15px;overflow:hidden;box-shadow:none}.flowDetails{margin-top:16px}.flowSummary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;cursor:pointer;background:#fbfcfb;user-select:none}.flowSummary::-webkit-details-marker{display:none}.flowSummary:hover{background:#f3f8f5}.flowTitle{display:flex;align-items:center;gap:10px;min-width:0}.flowTitle b{font-size:15px}.flowStatus{font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:#e7f7ef;color:#006b4e;white-space:nowrap}.flowSummaryRight{display:flex;align-items:center;gap:10px;color:#5f756d;font-size:12px;font-weight:700}.flowChevron{width:26px;height:26px;border:1px solid #cfe0d9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;color:var(--green);transition:transform .2s ease}.flowDetails[open] .flowChevron{transform:rotate(180deg)}.flowBody{padding:18px 18px 16px;border-top:1px solid #e5ebe7}.flowHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.flowHeadTitle{font-size:15px;font-weight:800}.receiptBtn{background:#fff!important;color:var(--green)!important;border:1px solid #70ab95!important;box-shadow:none!important;padding:8px 11px!important;font-size:12px}.receiptBtn:hover{background:#edf7f3!important;color:#004533!important}
-.flowTimelineWrap{overflow-x:auto;padding:3px 0 6px}.flowTimeline{position:relative;display:grid;grid-template-columns:repeat(7,minmax(82px,1fr));min-width:650px;padding:0 2px}.flowTimeline:before{content:"";position:absolute;left:7%;right:7%;top:25px;height:2px;background:#cbe6db;z-index:0}.flowNode{position:relative;z-index:1;text-align:center;color:#657681;font-size:11px;font-weight:700}.flowCircle{width:50px;height:50px;margin:0 auto 7px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f5fbf8;border:1.5px solid #b9dfd0;color:#00684d}.flowCircle svg{width:21px;height:21px;stroke:currentColor}.flowNode.done .flowCircle{background:#eefaf5;border-color:#8fd2ba;color:#00684d}.flowNode.active .flowCircle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 6px 14px rgba(0,90,67,.18)}.flowNode.active{color:#00523d}.flowNode.done{color:#315e50}.flowCheck{font-size:20px;font-weight:900;line-height:1}
+.flowTimelineWrap{overflow-x:auto;padding:3px 0 6px}.flowTimeline{position:relative;display:grid;grid-template-columns:repeat(7,minmax(82px,1fr));min-width:650px;padding:0 2px}.flowTimeline:before{content:"";position:absolute;left:7%;right:7%;top:25px;height:2px;background:#cbe6db;z-index:0}.flowNode{position:relative;z-index:1;text-align:center;color:#657681;font-size:11px;font-weight:700}.flowCircle{width:50px;height:50px;margin:0 auto 7px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f5fbf8;border:1.5px solid #b9dfd0;color:#00684d}.flowCircle svg{width:21px;height:21px;stroke:currentColor}.flowNode.done .flowCircle{background:#eefaf5;border-color:#8fd2ba;color:#00684d}.flowNode.active .flowCircle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 6px 14px rgba(0,90,67,.18)}.flowNode.active{color:#00523d}.flowNode.done{color:#315e50}.flowCheck{font-size:20px;font-weight:900;line-height:1}.flowNode.active.disputeState .flowCircle{background:#7f1d1d;border-color:#7f1d1d;color:#fff;box-shadow:0 6px 14px rgba(127,29,29,.18)}.flowNode.active.disputeState{color:#7f1d1d}.flowNode.active.refundState .flowCircle{background:#0f5f4b;border-color:#0f5f4b;color:#fff;box-shadow:0 6px 14px rgba(15,95,75,.18)}.flowNode.active.refundState{color:#0f5f4b}
 .flowMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e5ebe7;margin:12px -18px -16px}.flowMetaItem{display:flex;align-items:center;gap:10px;padding:13px 18px;min-width:0}.flowMetaItem+ .flowMetaItem{border-left:1px solid #e5ebe7}.metaIcon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2faf6;color:#00684d;border:1px solid #d2eadd;flex:0 0 auto}.metaLabel{font-size:10px;color:#8997a4}.metaValue{font-size:12px;font-weight:800;color:#283641;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shipmentNote{font-size:11px;color:#718095;margin-top:10px}
 
 @media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
@@ -792,7 +792,9 @@ function flowIcon(key){
     sourcing:'<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke-width="1.8"/><path d="M16 16l4 4" stroke-width="1.8" stroke-linecap="round"/></svg>',
     shipped:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 8l7-4 7 4-7 4zM5 8v8l7 4 7-4V8M12 12v8" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     in_transit:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" stroke-width="1.8"/><circle cx="18" cy="18" r="2" stroke-width="1.8"/></svg>',
-    completed:'<span class="flowCheck">✓</span>'
+    completed:'<span class="flowCheck">✓</span>',
+    disputed:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke-width="1.8"/><path d="M12 7v6M12 17h.01" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    refunded:'<svg viewBox="0 0 24 24" fill="none"><path d="M8 8H5v-3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8a8 8 0 1 1-1 6" stroke-width="1.8" stroke-linecap="round"/><path d="M15 9.5c-.5-.7-1.3-1-2.2-1-1.2 0-2.1.6-2.1 1.5 0 2.3 4.5 1.1 4.5 3.6 0 .9-.9 1.6-2.2 1.6-1 0-1.9-.4-2.5-1.1M13 7v10" stroke-width="1.5" stroke-linecap="round"/></svg>'
   };
   return icons[key]||"";
 }
@@ -810,14 +812,22 @@ function renderInvoice(o,vendor,client){
     </div></div>`;
 }
 function renderTracking(o){
-  const stages=[["requested","Request"],["invoiced","Quote"],["escrow_funded","Escrow"],["sourcing","Sourcing"],["shipped","Shipped"],["in_transit","In transit"],["completed","Completed"]];
-  const rank={requested:0,invoiced:1,escrow_funded:3,shipped:4,in_transit:5,completed:6,disputed:5,refunded:6,declined:-1,cancelled:-1};
+  const role=state.currentUser?state.currentUser.role:"";
+  let terminal=["completed","Completed"];
+  if(o.status==="disputed") terminal=["disputed","Disputed"];
+  if(o.status==="refunded") terminal=role==="vendor"?["disputed","Disputed"]:["refunded","Refunded"];
+
+  const stages=[["requested","Request"],["invoiced","Quote"],["escrow_funded","Escrow"],["sourcing","Sourcing"],["shipped","Shipped"],["in_transit","In transit"],terminal];
+  const rank={requested:0,invoiced:1,escrow_funded:3,shipped:4,in_transit:5,completed:6,disputed:6,refunded:6,declined:-1,cancelled:-1};
   const labels={requested:"Request sent",invoiced:"Quote ready",escrow_funded:"Sourcing",shipped:"Shipped",in_transit:"In transit",completed:"Completed",disputed:"Disputed",refunded:"Refunded",declined:"Declined",cancelled:"Cancelled"};
+  const displayedStatus=o.status==="refunded"&&role==="vendor"?"Disputed":(labels[o.status]||o.status);
   const current=rank[o.status]??0;
   const nodes=stages.map(([k,label],i)=>{
-    const active=(o.status==="escrow_funded"&&k==="sourcing")||o.status===k;
+    const vendorRefundDispute=o.status==="refunded"&&role==="vendor"&&k==="disputed";
+    const active=(o.status==="escrow_funded"&&k==="sourcing")||o.status===k||vendorRefundDispute;
     const done=current>i||(o.status==="escrow_funded"&&i<=2);
-    return `<div class="flowNode ${active?"active":done?"done":""}"><div class="flowCircle">${flowIcon(k)}</div><div>${label}</div></div>`;
+    const stateClass=k==="disputed"?"disputeState":k==="refunded"?"refundState":"";
+    return `<div class="flowNode ${active?"active":done?"done":""} ${stateClass}"><div class="flowCircle">${flowIcon(k)}</div><div>${label}</div></div>`;
   }).join("");
   const carrier=o.shipment&&o.shipment.carrier?o.shipment.carrier:"—";
   const tracking=o.shipment&&o.shipment.tracking_number?o.shipment.tracking_number:"—";
@@ -834,7 +844,7 @@ function renderTracking(o){
 
   if(state.currentUser&&state.currentUser.role==="client"){
     const isOpen=state.openFlowIds.has(o.id);
-    return `<details class="flowDetails" ${isOpen?"open":""} ontoggle="handleFlowToggle(event,'${o.id}')"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
+    return `<details class="flowDetails" ${isOpen?"open":""} ontoggle="handleFlowToggle(event,'${o.id}')"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(displayedStatus)}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
   }
   return `<div class="flowCard mt16"><div class="flowBody" style="border-top:0">${flowBody}</div></div>`;
 }
