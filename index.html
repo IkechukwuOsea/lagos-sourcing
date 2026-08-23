@@ -80,7 +80,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/fireba
 import {
   getAuth,
   setPersistence,
-  browserLocalPersistence,
+  browserSessionPersistence,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -263,16 +263,73 @@ async function loadData(){
   state.orders=baseOrders.map((o,i)=>mapOrder(o.id,o,related[i].history,related[i].shipment,related[i].dispute));
 }
 
+const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+let idleTimer = null;
+let lastActivityAt = Date.now();
+
+function clearSensitiveAuthFields(){
+  ["li-password","su-password"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value="";
+  });
+}
+
+function scheduleSensitiveFieldClear(){
+  clearSensitiveAuthFields();
+  setTimeout(clearSensitiveAuthFields,80);
+  setTimeout(clearSensitiveAuthFields,250);
+}
+
+async function autoLogoutForInactivity(){
+  if(!auth.currentUser) return;
+  try{await signOut(auth)}catch(e){console.warn(e)}
+  state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+  state.view="auth";state.authMode="login";state.error="";
+  state.notice="You were signed out after 15 minutes of inactivity.";
+  render();
+}
+
+function armIdleTimer(){
+  clearTimeout(idleTimer);
+  if(!auth.currentUser) return;
+  const remaining=Math.max(0,IDLE_TIMEOUT_MS-(Date.now()-lastActivityAt));
+  idleTimer=setTimeout(autoLogoutForInactivity,remaining);
+}
+
+function noteUserActivity(){
+  if(!auth.currentUser) return;
+  lastActivityAt=Date.now();
+  armIdleTimer();
+}
+
+["mousedown","keydown","touchstart","scroll"].forEach(evt=>{
+  window.addEventListener(evt,noteUserActivity,{passive:true});
+});
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"&&auth.currentUser){
+    if(Date.now()-lastActivityAt>=IDLE_TIMEOUT_MS) autoLogoutForInactivity();
+    else armIdleTimer();
+  }
+});
+
+window.addEventListener("pageshow",()=>{
+  if(!auth.currentUser) scheduleSensitiveFieldClear();
+});
+
 async function init(){
   try{
-    await setPersistence(auth,browserLocalPersistence);
+    await setPersistence(auth,browserSessionPersistence);
     onAuthStateChanged(auth,async user=>{
       try{
         if(user){
           state.sessionUser=user;
           await loadData();
           state.view="dashboard";
+          lastActivityAt=Date.now();
+          armIdleTimer();
         }else{
+          clearTimeout(idleTimer);
           state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
           state.view="auth";
         }
@@ -331,6 +388,8 @@ async function handleSignup(e){
     state.sessionUser=cred.user;
     await loadData();
     state.view="dashboard";
+    lastActivityAt=Date.now();
+    armIdleTimer();
     state.notice=state.authRole==="vendor"?"Account created. An admin must verify your vendor profile before clients can see it.":"Account created successfully.";
   }catch(e){
     state.error=friendlyError(e);
@@ -349,14 +408,18 @@ async function handleLogin(e){
     state.sessionUser=cred.user;
     await loadData();
     state.view="dashboard";
+    lastActivityAt=Date.now();
+    armIdleTimer();
   }catch(e){state.error=friendlyError(e)}
   state.loadingAction=false;render();
 }
 
 async function handleLogout(){
+  clearTimeout(idleTimer);
   try{await signOut(auth)}catch(e){console.warn(e)}
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";state.notice="";render();
+  scheduleSensitiveFieldClear();
 }
 
 async function addHistory(orderId,status){
@@ -666,17 +729,17 @@ function renderAuth(){
     <div class="card p24">${tabs}
       ${state.notice?`<div class="notice mb16">${escapeHtml(state.notice)}</div>`:""}${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
       ${state.authMode==="signup"?`
-      <form onsubmit="handleSignup(event)" class="grid">
-        <div><label class="text14 semibold">Full name</label><input id="su-name" required></div>
-        <div><label class="text14 semibold">Email</label><input id="su-email" type="email" required></div>
-        <div><label class="text14 semibold">Phone / WhatsApp (optional)</label><input id="su-phone" type="tel"></div>
-        <div><label class="text14 semibold">Password</label><input id="su-password" type="password" minlength="8" required></div>
+      <form onsubmit="handleSignup(event)" class="grid" autocomplete="off">
+        <div><label class="text14 semibold">Full name</label><input id="su-name" name="signup-name" autocomplete="off" required></div>
+        <div><label class="text14 semibold">Email</label><input id="su-email" name="signup-email" type="email" autocomplete="off" required></div>
+        <div><label class="text14 semibold">Phone / WhatsApp (optional)</label><input id="su-phone" name="signup-phone" type="tel" autocomplete="off"></div>
+        <div><label class="text14 semibold">Password</label><input id="su-password" name="signup-password" type="password" minlength="8" autocomplete="new-password" value="" required></div>
         ${vendorFields}
         <button class="btn-primary" style="padding:11px;border-radius:8px" ${state.loadingAction?"disabled":""}>${state.loadingAction?"Creating account…":"Create account"}</button>
       </form><p class="centerText text14 muted mt16">Already registered? <button class="action" onclick="switchAuthMode('login')">Log in</button></p>`:
-      `<form onsubmit="handleLogin(event)" class="grid">
-        <div><label class="text14 semibold">Email</label><input id="li-email" type="email" required></div>
-        <div><label class="text14 semibold">Password</label><input id="li-password" type="password" required></div>
+      `<form onsubmit="handleLogin(event)" class="grid" autocomplete="off">
+        <div><label class="text14 semibold">Email</label><input id="li-email" name="login-email" type="email" autocomplete="off" required></div>
+        <div><label class="text14 semibold">Password</label><input id="li-password" name="login-password" type="password" autocomplete="off" value="" required></div>
         <button class="btn-primary" style="padding:11px;border-radius:8px" ${state.loadingAction?"disabled":""}>${state.loadingAction?"Logging in…":"Log in"}</button>
       </form><p class="centerText text14 muted mt16">New here? <button class="action" onclick="switchAuthMode('signup')">Create an account</button></p>`}
     </div></div>`;
@@ -743,7 +806,7 @@ function renderDashboard(){
 function render(){
   const root=document.getElementById("root");
   if(state.view==="loading")root.innerHTML=`<div class="card p24">Connecting to the backend…</div>`;
-  else if(state.view==="auth")root.innerHTML=renderAuth();
+  else if(state.view==="auth"){root.innerHTML=renderAuth();scheduleSensitiveFieldClear();}
   else root.innerHTML=renderDashboard();
 }
 
