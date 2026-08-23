@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lagos Sourcing Platform</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#F5F3EF;color:#1C1B18}
 .card{background:#fff;border:1px solid #E7E3DA;border-radius:12px}.btn-primary{background:#14312B;color:#F5F3EF;border:0}.btn-primary:hover{background:#1D453C}
@@ -33,18 +33,47 @@ function showFatal(message){const b=document.getElementById("startup-error"),m=d
 <div id="startup-error" style="display:none;max-width:1050px;margin:16px auto;padding:16px;border:1px solid #fca5a5;background:#fef2f2;color:#7f1d1d;border-radius:12px">
 <strong>The app hit an error:</strong><pre id="startup-error-message" style="white-space:pre-wrap"></pre></div>
 
-<script>
-const SUPABASE_URL = "https://mxngkxiixncqhkbentva.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_yc2jRWEEMf-F7_v5R5zePw_wzN685Y2";
-const SITE_URL = "https://ikechukwuosea.github.io/lagos-sourcing/";
-const AUTO_RELEASE_DAYS = 3;
 
-if (!window.supabase || !window.supabase.createClient) {
-  throw new Error("The Supabase browser library did not load. Check your internet connection and refresh.");
-}
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-});
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  setDoc,
+  updateDoc,
+  query,
+  where,
+  serverTimestamp,
+  Timestamp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIfq9BAJuEjl8RZcp9ifDy8uIsnN3anDo",
+  authDomain: "lagos-sourcing.firebaseapp.com",
+  projectId: "lagos-sourcing",
+  storageBucket: "lagos-sourcing.firebasestorage.app",
+  messagingSenderId: "202595139394",
+  appId: "1:202595139394:web:e12a95c787e3b8c360d2db"
+};
+
+const SITE_URL = "https://ikechukwuosea.github.io/lagos-sourcing/";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 let state = {
   users: [], orders: [], currentUser: null, sessionUser: null,
@@ -59,72 +88,169 @@ let state = {
 
 function escapeHtml(v){const d=document.createElement("div");d.textContent=v==null?"":String(v);return d.innerHTML}
 function formatNaira(n){return "₦"+Number(n||0).toLocaleString("en-NG")}
-function displayDate(v){if(!v)return "";const d=new Date(v);return Number.isNaN(d.getTime())?"":d.toLocaleDateString()}
-function displayDateTime(v){if(!v)return "";const d=new Date(v);return Number.isNaN(d.getTime())?"":d.toLocaleString()}
+function asDate(v){
+  if(!v) return null;
+  if(v instanceof Timestamp) return v.toDate();
+  if(v && typeof v.toDate==="function") return v.toDate();
+  const d=new Date(v);
+  return Number.isNaN(d.getTime())?null:d;
+}
+function displayDate(v){const d=asDate(v);return d?d.toLocaleDateString():""}
+function displayDateTime(v){const d=asDate(v);return d?d.toLocaleString():""}
 function categoriesArray(v){return Array.isArray(v)?v:String(v||"").split(",").map(x=>x.trim()).filter(Boolean)}
-function friendlyError(err){return err&&err.message?err.message:String(err||"Something went wrong.")}
+function friendlyError(err){
+  const code=err&&err.code?String(err.code):"";
+  if(code.includes("auth/invalid-credential")) return "Incorrect email or password.";
+  if(code.includes("auth/email-already-in-use")) return "That email is already registered.";
+  if(code.includes("auth/weak-password")) return "Use a stronger password.";
+  if(code.includes("auth/unauthorized-domain")) return "This website domain is not authorized in Firebase Authentication.";
+  if(code.includes("permission-denied")) return "Permission denied by Firestore security rules.";
+  return err&&err.message?err.message:String(err||"Something went wrong.");
+}
 function userById(id){return state.users.find(u=>u.id===id)}
 
-function profileToUser(p){
+function profileToUser(id,p){
   return {
-    id:p.id, name:p.full_name||"Unnamed user", role:p.role||"client",
-    businessName:p.business_name||"", market:p.market||"",
-    categories:categoriesArray(p.categories), verified:!!p.verified,
-    phone:p.phone||"", createdAt:p.created_at
+    id,
+    name:p.fullName||"Unnamed user",
+    role:p.role||"client",
+    businessName:p.businessName||"",
+    market:p.market||"",
+    categories:categoriesArray(p.categories),
+    verified:!!p.verified,
+    phone:p.phone||"",
+    createdAt:p.createdAt||null
   };
 }
-function mapOrder(row, histories, shipments, disputes){
-  const h=(histories||[]).filter(x=>x.order_id===row.id).map(x=>({status:x.status,at:x.created_at}));
-  const s=(shipments||[]).find(x=>x.order_id===row.id)||null;
-  const d=(disputes||[]).find(x=>x.order_id===row.id)||null;
+
+function mapOrder(id,row,history,shipment,dispute){
   return {
-    id:row.id, clientId:row.client_id, vendorId:row.vendor_id,
-    itemDesc:row.item_desc, market:row.market||"", status:row.status,
-    itemCost:row.item_cost==null?null:Number(row.item_cost),
-    deliveryCost:row.delivery_cost==null?null:Number(row.delivery_cost),
-    totalCost:row.total_cost==null?null:Number(row.total_cost),
-    invoiceNumber:row.invoice_number||"", invoicedAt:row.invoiced_at,
-    escrowFundedAt:row.escrow_funded_at, shipmentProof:row.shipment_proof||"",
-    shippedAt:row.shipped_at, inTransitAt:row.in_transit_at,
-    completedAt:row.completed_at, cancelledAt:row.cancelled_at,
-    cancellationReason:row.cancellation_reason||"", autoReleased:!!row.auto_released,
-    createdAt:row.created_at, statusHistory:h, shipment:s,
-    dispute:d?{reason:d.reason,raisedAt:d.created_at,status:d.status,resolution:d.resolution,adminNotes:d.admin_notes,resolvedAt:d.resolved_at}:null
+    id,
+    clientId:row.clientId,
+    vendorId:row.vendorId,
+    itemDesc:row.itemDesc||"",
+    market:row.market||"",
+    status:row.status||"requested",
+    itemCost:row.itemCost==null?null:Number(row.itemCost),
+    deliveryCost:row.deliveryCost==null?null:Number(row.deliveryCost),
+    totalCost:row.totalCost==null?null:Number(row.totalCost),
+    invoiceNumber:row.invoiceNumber||"",
+    invoicedAt:row.invoicedAt||null,
+    escrowFundedAt:row.escrowFundedAt||null,
+    shipmentProof:row.shipmentProof||"",
+    shippedAt:row.shippedAt||null,
+    inTransitAt:row.inTransitAt||null,
+    completedAt:row.completedAt||null,
+    cancelledAt:row.cancelledAt||null,
+    cancellationReason:row.cancellationReason||"",
+    autoReleased:!!row.autoReleased,
+    createdAt:row.createdAt||null,
+    statusHistory:(history||[]).map(h=>({status:h.status,at:h.createdAt})),
+    shipment:shipment?{
+      carrier:shipment.carrier||"",
+      tracking_number:shipment.trackingNumber||"",
+      shipment_notes:shipment.shipmentNotes||"",
+      shipped_at:shipment.shippedAt||null,
+      in_transit_at:shipment.inTransitAt||null
+    }:null,
+    dispute:dispute?{
+      reason:dispute.reason||"",
+      raisedAt:dispute.createdAt||null,
+      status:dispute.status||"open",
+      resolution:dispute.resolution||null,
+      adminNotes:dispute.adminNotes||"",
+      resolvedAt:dispute.resolvedAt||null
+    }:null
   };
+}
+
+async function getOwnProfile(uid){
+  const snap=await getDoc(doc(db,"users",uid));
+  if(!snap.exists()) throw new Error("Your Firebase Authentication account has no matching Firestore users profile.");
+  return profileToUser(snap.id,snap.data());
+}
+
+async function getProfilesForRole(current){
+  if(current.role==="admin"){
+    const snap=await getDocs(collection(db,"users"));
+    return snap.docs.map(d=>profileToUser(d.id,d.data()));
+  }
+  if(current.role==="client"){
+    const q=query(collection(db,"users"),where("role","==","vendor"),where("verified","==",true));
+    const snap=await getDocs(q);
+    const vendors=snap.docs.map(d=>profileToUser(d.id,d.data()));
+    return [current,...vendors.filter(v=>v.id!==current.id)];
+  }
+  return [current];
+}
+
+async function getOrdersForRole(current){
+  let snap;
+  if(current.role==="admin"){
+    snap=await getDocs(collection(db,"orders"));
+  }else if(current.role==="client"){
+    snap=await getDocs(query(collection(db,"orders"),where("clientId","==",current.id)));
+  }else{
+    snap=await getDocs(query(collection(db,"orders"),where("vendorId","==",current.id)));
+  }
+  return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+    const da=asDate(a.createdAt)?.getTime()||0, dbb=asDate(b.createdAt)?.getTime()||0;
+    return dbb-da;
+  });
+}
+
+async function loadRelated(orderId){
+  const [hs,ss,ds]=await Promise.all([
+    getDocs(query(collection(db,"orderHistory"),where("orderId","==",orderId))),
+    getDocs(query(collection(db,"shipments"),where("orderId","==",orderId))),
+    getDocs(query(collection(db,"disputes"),where("orderId","==",orderId)))
+  ]);
+  const history=hs.docs.map(d=>d.data()).sort((a,b)=>(asDate(a.createdAt)?.getTime()||0)-(asDate(b.createdAt)?.getTime()||0));
+  const shipment=ss.docs[0]?ss.docs[0].data():null;
+  const dispute=ds.docs[0]?ds.docs[0].data():null;
+  return {history,shipment,dispute};
 }
 
 async function loadData(){
-  const [{data:profiles,error:pe},{data:orders,error:oe},{data:history,error:he},{data:shipments,error:se},{data:disputes,error:de}] = await Promise.all([
-    sb.from("profiles").select("*").order("created_at",{ascending:true}),
-    sb.from("orders").select("*").order("created_at",{ascending:false}),
-    sb.from("order_status_history").select("*").order("created_at",{ascending:true}),
-    sb.from("shipments").select("*"),
-    sb.from("disputes").select("*")
-  ]);
-  const err=pe||oe||he||se||de;if(err)throw err;
-  state.users=(profiles||[]).map(profileToUser);
-  state.orders=(orders||[]).map(o=>mapOrder(o,history,shipments,disputes));
-  if(state.sessionUser){
-    state.currentUser=state.users.find(u=>u.id===state.sessionUser.id)||null;
-    if(!state.currentUser) throw new Error("Your authenticated account has no profile row. Create/fix the profile in the backend before continuing.");
-  }
+  if(!auth.currentUser) return;
+  const current=await getOwnProfile(auth.currentUser.uid);
+  state.currentUser=current;
+  state.sessionUser=auth.currentUser;
+  state.users=await getProfilesForRole(current);
+  const baseOrders=await getOrdersForRole(current);
+  const related=await Promise.all(baseOrders.map(o=>loadRelated(o.id)));
+  state.orders=baseOrders.map((o,i)=>mapOrder(o.id,o,related[i].history,related[i].shipment,related[i].dispute));
 }
 
 async function init(){
   try{
-    const {data:{session},error}=await sb.auth.getSession();if(error)throw error;
-    if(session&&session.user){
-      state.sessionUser=session.user;
-      try{await sb.rpc("release_expired_orders")}catch(e){console.warn("Auto-release check skipped:",e.message)}
-      await loadData();
-      state.view="dashboard";
-    }else state.view="auth";
-  }catch(e){state.view="auth";state.error=friendlyError(e)}
-  render();
+    await setPersistence(auth,browserLocalPersistence);
+    onAuthStateChanged(auth,async user=>{
+      try{
+        if(user){
+          state.sessionUser=user;
+          await loadData();
+          state.view="dashboard";
+        }else{
+          state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+          state.view="auth";
+        }
+        state.error="";
+      }catch(e){
+        state.view="auth";
+        state.error=friendlyError(e);
+      }
+      render();
+    });
+  }catch(e){
+    state.view="auth";
+    state.error=friendlyError(e);
+    render();
+  }
 }
 
 async function refreshData(){
-  if(!state.sessionUser)return;
+  if(!auth.currentUser)return;
   state.loadingAction=true;state.error="";render();
   try{await loadData()}catch(e){state.error=friendlyError(e)}
   state.loadingAction=false;render();
@@ -146,21 +272,28 @@ async function handleSignup(e){
   if(password.length<8){state.error="Use a password with at least 8 characters.";render();return}
   state.loadingAction=true;render();
   try{
-    const {data,error}=await sb.auth.signUp({
-      email,password,
-      options:{
-        emailRedirectTo:SITE_URL,
-        data:{full_name:name,role:state.authRole,phone,business_name:business,market,categories}
-      }
-    });
-    if(error)throw error;
-    if(data.session&&data.user){
-      state.sessionUser=data.user;await loadData();state.view="dashboard";
-    }else{
-      state.notice="Account created. Check your email and confirm the account, then return here to log in.";
-      state.authMode="login";
+    const cred=await createUserWithEmailAndPassword(auth,email,password);
+    const profile={
+      fullName:name,
+      role:state.authRole,
+      verified:false,
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    };
+    if(phone) profile.phone=phone;
+    if(state.authRole==="vendor"){
+      profile.businessName=business||name;
+      profile.market=market||"Computer Village (Ikeja)";
+      profile.categories=categories;
     }
-  }catch(e){state.error=friendlyError(e)}
+    await setDoc(doc(db,"users",cred.user.uid),profile);
+    state.sessionUser=cred.user;
+    await loadData();
+    state.view="dashboard";
+    state.notice=state.authRole==="vendor"?"Account created. An admin must verify your vendor profile before clients can see it.":"Account created successfully.";
+  }catch(e){
+    state.error=friendlyError(e);
+  }
   state.loadingAction=false;render();
 }
 
@@ -171,38 +304,54 @@ async function handleLogin(e){
   if(!email||!password){state.error="Enter your email and password.";render();return}
   state.loadingAction=true;render();
   try{
-    const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;
-    state.sessionUser=data.user;await loadData();state.view="dashboard";
+    const cred=await signInWithEmailAndPassword(auth,email,password);
+    state.sessionUser=cred.user;
+    await loadData();
+    state.view="dashboard";
   }catch(e){state.error=friendlyError(e)}
   state.loadingAction=false;render();
 }
 
 async function handleLogout(){
-  try{await sb.auth.signOut()}catch(e){console.warn(e)}
-  state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;state.view="auth";state.authMode="login";state.error="";state.notice="";render();
+  try{await signOut(auth)}catch(e){console.warn(e)}
+  state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+  state.view="auth";state.authMode="login";state.error="";state.notice="";render();
 }
 
-async function rpc(name,args={}){
-  const {error}=await sb.rpc(name,args);if(error)throw error;
-  await loadData();
+async function addHistory(orderId,status){
+  await addDoc(collection(db,"orderHistory"),{
+    orderId,
+    status,
+    actorId:auth.currentUser.uid,
+    createdAt:serverTimestamp()
+  });
 }
+
 async function runAction(work, fallbackStateKey){
   state.error="";if(fallbackStateKey)state[fallbackStateKey]="";state.loadingAction=true;render();
-  try{await work()}catch(e){if(fallbackStateKey)state[fallbackStateKey]=friendlyError(e);else state.error=friendlyError(e)}
+  try{
+    await work();
+    await loadData();
+  }catch(e){
+    if(fallbackStateKey)state[fallbackStateKey]=friendlyError(e);
+    else state.error=friendlyError(e);
+  }
   state.loadingAction=false;render();
 }
 
 async function toggleVendorVerified(id){
   const u=userById(id);if(!u)return;
-  await runAction(()=>rpc("admin_set_vendor_verified",{p_vendor_id:id,p_verified:!u.verified}));
+  await runAction(async()=>{
+    await updateDoc(doc(db,"users",id),{verified:!u.verified,updatedAt:serverTimestamp()});
+  });
 }
 
 function runVendorSearch(e){
   e.preventDefault();
-  const q=document.getElementById("vendor-search").value.trim().toLowerCase();
-  state.searchQuery=q;
-  if(!q){state.searchResults=null;render();return}
-  const tokens=q.split(/\s+/).filter(t=>t.length>1);
+  const qv=document.getElementById("vendor-search").value.trim().toLowerCase();
+  state.searchQuery=qv;
+  if(!qv){state.searchResults=null;render();return}
+  const tokens=qv.split(/\s+/).filter(t=>t.length>1);
   const vendors=state.users.filter(u=>u.role==="vendor"&&u.verified);
   state.searchResults=vendors.map(v=>{
     const hay=[v.businessName,v.name,v.market,...v.categories].join(" ").toLowerCase();
@@ -216,10 +365,25 @@ function clearVendorSearch(){state.searchQuery="";state.searchResults=null;rende
 function openRequestForm(id){state.requestingVendorId=id;state.requestError="";render()}
 function closeRequestForm(){state.requestingVendorId=null;state.requestError="";render()}
 async function submitRequest(e){
-  e.preventDefault();const item=document.getElementById("req-item").value.trim();
+  e.preventDefault();
+  const item=document.getElementById("req-item").value.trim();
   if(!item){state.requestError="Describe the item you want.";render();return}
   const vendorId=state.requestingVendorId;
-  await runAction(async()=>{await rpc("client_create_order",{p_vendor_id:vendorId,p_item_desc:item});state.requestingVendorId=null},"requestError");
+  const vendor=userById(vendorId);
+  await runAction(async()=>{
+    const ref=await addDoc(collection(db,"orders"),{
+      clientId:auth.currentUser.uid,
+      vendorId,
+      itemDesc:item,
+      market:vendor?vendor.market:"",
+      status:"requested",
+      autoReleased:false,
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(ref.id,"requested");
+    state.requestingVendorId=null;
+  },"requestError");
 }
 
 function openInvoiceForm(id){state.invoicingOrderId=id;state.invoiceError="";render()}
@@ -231,19 +395,53 @@ async function submitInvoice(e){
   if(!Number.isFinite(item)||item<=0){state.invoiceError="Enter a valid item cost.";render();return}
   if(!Number.isFinite(delivery)||delivery<0){state.invoiceError="Enter a valid delivery cost.";render();return}
   const id=state.invoicingOrderId;
-  await runAction(async()=>{await rpc("vendor_quote_order",{p_order_id:id,p_item_cost:item,p_delivery_cost:delivery});state.invoicingOrderId=null},"invoiceError");
+  await runAction(async()=>{
+    const invoice="INV-"+crypto.randomUUID().replace(/-/g,"").slice(0,8).toUpperCase();
+    await updateDoc(doc(db,"orders",id),{
+      status:"invoiced",
+      itemCost:item,
+      deliveryCost:delivery,
+      totalCost:item+delivery,
+      invoiceNumber:invoice,
+      invoicedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"invoiced");
+    state.invoicingOrderId=null;
+  },"invoiceError");
 }
+
 async function declineRequest(id){
   if(!confirm("Decline this sourcing request?"))return;
-  await runAction(()=>rpc("vendor_decline_order",{p_order_id:id}));
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{status:"declined",updatedAt:serverTimestamp()});
+    await addHistory(id,"declined");
+  });
 }
+
 async function cancelOrder(id){
   if(!confirm("Cancel this order before escrow funding?"))return;
-  await runAction(()=>rpc("client_cancel_order",{p_order_id:id,p_reason:"Cancelled by client"}));
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{
+      status:"cancelled",
+      cancelledAt:serverTimestamp(),
+      cancellationReason:"Cancelled by client",
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"cancelled");
+  });
 }
+
 async function fundEscrow(id){
   if(!confirm("This is still a SIMULATED escrow action. Continue for testing?"))return;
-  await runAction(()=>rpc("client_fund_escrow",{p_order_id:id}));
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{
+      status:"escrow_funded",
+      escrowFundedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"escrow_funded");
+  });
 }
 
 function openShipForm(id){state.shippingOrderId=id;state.shipError="";render()}
@@ -255,26 +453,98 @@ async function submitShipment(e){
   const notes=document.getElementById("ship-notes").value.trim();
   if(!carrier&&!tracking&&!notes){state.shipError="Enter carrier, tracking number, or shipment notes.";render();return}
   const id=state.shippingOrderId;
-  await runAction(async()=>{await rpc("vendor_ship_order",{p_order_id:id,p_carrier:carrier,p_tracking_number:tracking,p_shipment_notes:notes});state.shippingOrderId=null},"shipError");
+  await runAction(async()=>{
+    const parts=[];
+    if(carrier)parts.push("Carrier: "+carrier);
+    if(tracking)parts.push("Tracking: "+tracking);
+    if(notes)parts.push(notes);
+    await updateDoc(doc(db,"orders",id),{
+      status:"shipped",
+      shipmentProof:parts.join(" | "),
+      shippedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await setDoc(doc(db,"shipments",id),{
+      orderId:id,
+      vendorId:auth.currentUser.uid,
+      carrier,
+      trackingNumber:tracking,
+      shipmentNotes:notes,
+      shippedAt:serverTimestamp(),
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"shipped");
+    state.shippingOrderId=null;
+  },"shipError");
 }
-async function markInTransit(id){await runAction(()=>rpc("vendor_mark_in_transit",{p_order_id:id}))}
+
+async function markInTransit(id){
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{
+      status:"in_transit",
+      inTransitAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await updateDoc(doc(db,"shipments",id),{
+      inTransitAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"in_transit");
+  });
+}
+
 async function confirmReceipt(id){
   if(!confirm("Confirm that you received this order?"))return;
-  await runAction(()=>rpc("client_confirm_receipt",{p_order_id:id}));
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{
+      status:"completed",
+      completedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"completed");
+  });
 }
 
 function openDisputeForm(id){state.disputingOrderId=id;state.disputeError="";render()}
 function closeDisputeForm(){state.disputingOrderId=null;state.disputeError="";render()}
 async function submitDispute(e){
-  e.preventDefault();const reason=document.getElementById("dispute-reason").value.trim();
+  e.preventDefault();
+  const reason=document.getElementById("dispute-reason").value.trim();
   if(!reason){state.disputeError="Explain what went wrong.";render();return}
   const id=state.disputingOrderId;
-  await runAction(async()=>{await rpc("client_raise_dispute",{p_order_id:id,p_reason:reason});state.disputingOrderId=null},"disputeError");
+  await runAction(async()=>{
+    await updateDoc(doc(db,"orders",id),{status:"disputed",updatedAt:serverTimestamp()});
+    await setDoc(doc(db,"disputes",id),{
+      orderId:id,
+      raisedBy:auth.currentUser.uid,
+      reason,
+      status:"open",
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,"disputed");
+    state.disputingOrderId=null;
+  },"disputeError");
 }
+
 async function resolveDispute(id,resolution){
-  const el=document.getElementById("dispute-notes-"+id);const notes=el?el.value.trim():"";
+  const el=document.getElementById("dispute-notes-"+id);
+  const notes=el?el.value.trim():"";
   if(!confirm(resolution==="release"?"Release the order to the vendor?":"Resolve in the client's favour?"))return;
-  await runAction(()=>rpc("admin_resolve_dispute",{p_order_id:id,p_resolution:resolution,p_admin_notes:notes}));
+  await runAction(async()=>{
+    const orderUpdate={status:resolution==="release"?"completed":"refunded",updatedAt:serverTimestamp()};
+    if(resolution==="release")orderUpdate.completedAt=serverTimestamp();
+    await updateDoc(doc(db,"orders",id),orderUpdate);
+    await updateDoc(doc(db,"disputes",id),{
+      status:"resolved",
+      resolution,
+      adminNotes:notes,
+      resolvedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    });
+    await addHistory(id,orderUpdate.status);
+  });
 }
 
 function statusBadge(status){
@@ -318,8 +588,8 @@ function renderAuth(){
     <div><label class="text14 semibold">What do you sell?</label><input id="su-categories" placeholder="laptops, phones, accessories"></div>`:"";
   const tabs=state.authMode==="signup"?`<div class="flex gap8 mb16"><button type="button" class="${state.authRole==="client"?"btn-primary":"action"}" style="flex:1;padding:10px;border-radius:8px" onclick="switchAuthRole('client')">I'm a client</button><button type="button" class="${state.authRole==="vendor"?"btn-primary":"action"}" style="flex:1;padding:10px;border-radius:8px" onclick="switchAuthRole('vendor')">I'm a vendor</button></div>`:"";
   return `<div class="auth">
-    <div class="centerText mb24"><h1>Lagos Sourcing Platform</h1><p class="muted">Shared accounts and order tracking backed by Supabase.</p></div>
-    <div class="card p20 mb16"><div class="notice"><b>Backend connected.</b> Accounts now use email/password authentication and database permissions.</div><div class="warn mt12"><b>Development warning:</b> the “fund escrow” button still simulates payment. Do not use this build for real money yet.</div></div>
+    <div class="centerText mb24"><h1>Lagos Sourcing Platform</h1><p class="muted">Shared accounts and order tracking backed by Firebase.</p></div>
+    <div class="card p20 mb16"><div class="notice"><b>Firebase connected.</b> Accounts use email/password authentication and Firestore security rules.</div><div class="warn mt12"><b>Development warning:</b> the “fund escrow” button still simulates payment. Do not use this build for real money yet.</div></div>
     <div class="card p24">${tabs}
       ${state.notice?`<div class="notice mb16">${escapeHtml(state.notice)}</div>`:""}${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
       ${state.authMode==="signup"?`
@@ -399,7 +669,17 @@ function render(){
   else root.innerHTML=renderDashboard();
 }
 
+
+Object.assign(window,{
+  switchAuthMode,switchAuthRole,handleSignup,handleLogin,handleLogout,refreshData,
+  toggleVendorVerified,runVendorSearch,clearVendorSearch,openRequestForm,closeRequestForm,
+  submitRequest,openInvoiceForm,closeInvoiceForm,submitInvoice,declineRequest,cancelOrder,
+  fundEscrow,openShipForm,closeShipForm,submitShipment,markInTransit,confirmReceipt,
+  openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt
+});
+
 init();
 </script>
+
 </body>
 </html>
