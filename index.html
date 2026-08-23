@@ -23,6 +23,45 @@ textarea{resize:vertical}table{width:100%;border-collapse:collapse}th,td{padding
 .progressTrack{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden}.progressFill{height:100%;background:#059669;border-radius:999px}.tracking{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.stage{border:1px solid #cbd5e1;background:#E8E5DE;color:#475569;border-radius:8px;padding:8px;text-align:center;font-size:11px;font-weight:700}.stage.done{border-color:#6EE7B7;background:#D1FAE5;color:#065F46}.stage.active{border-color:#047857;background:#A7F3D0;color:#064E3B}
 .flowDetails{background:#fff;border:1px solid #DAD5CA;border-radius:12px;overflow:hidden}.flowSummary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;cursor:pointer;background:#F3F0EA;user-select:none}.flowSummary::-webkit-details-marker{display:none}.flowSummary:hover{background:#E8E3D9}.flowTitle{display:flex;align-items:center;gap:10px;min-width:0}.flowStatus{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:#14312B;color:#fff;white-space:nowrap}.flowChevron{font-size:20px;font-weight:700;color:#14312B;transition:transform .2s ease}.flowDetails[open] .flowChevron{transform:rotate(180deg)}.flowBody{padding:16px;border-top:1px solid #E7E3DA}.flowActions{display:flex;justify-content:flex-end;margin-bottom:12px}
 @media(max-width:760px){.g2,.g3{grid-template-columns:1fr}.tracking{grid-template-columns:repeat(2,minmax(0,1fr))}table{font-size:12px}.hideMobile{display:none}}
+
+
+/* ===== Polished Lagos Sourcing dashboard ===== */
+:root{--ink:#18232d;--muted:#6d7b8d;--green:#005a43;--green2:#08785b;--green-soft:#eefaf5;--line:#dfe7e3;--surface:#ffffff;--page:#f8f8f5;--shadow:0 10px 28px rgba(15,35,28,.07)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--page);color:var(--ink)}
+.max{max-width:1480px;padding:22px 28px 42px}
+.card{border-color:#e3e7e4;border-radius:16px;box-shadow:0 4px 14px rgba(31,45,38,.035)}
+input,select,textarea{border:1px solid #cfd9d4;border-radius:11px;padding:11px 13px;outline:none;transition:border-color .18s ease,box-shadow .18s ease;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:#0b7a5e;box-shadow:0 0 0 3px rgba(11,122,94,.12)}
+.action{background:#1a2932;color:#fff;border-color:#1a2932;border-radius:10px;padding:10px 14px;font-weight:700;box-shadow:0 2px 7px rgba(20,35,43,.10)}
+.action:hover{background:#0f1c23;border-color:#0f1c23;transform:translateY(-1px)}
+.btn-primary,.btn-primary.action{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important;box-shadow:0 6px 14px rgba(0,90,67,.20)}
+.btn-primary:hover,.btn-primary.action:hover{background:#004533!important;border-color:#004533!important}
+.danger,.action.danger{background:#fff1f1;color:#a11a1a;border-color:#efb1b1;box-shadow:none}.danger:hover,.action.danger:hover{background:#ffe3e3;color:#861313;border-color:#e98f8f}.redbtn,.redbtn.action{background:#a61b1b;color:#fff;border-color:#8f1515}.redbtn:hover,.redbtn.action:hover{background:#861313;border-color:#761111}
+button:disabled{opacity:.48;box-shadow:none;transform:none}
+.iconbtn{border-radius:12px;background:#fff;color:var(--green);border:1px solid #d7e1dc;box-shadow:0 3px 10px rgba(20,40,31,.05)}
+.iconbtn:hover{background:#edf7f3;color:#004533;border-color:#b9d7cb}
+.verifyPending{background:#9a5000!important;color:#fff!important;border-color:#7a3f00!important}.verifyPending:hover{background:#783e00!important}.verifyDone{background:#08785b!important;color:#fff!important;border-color:#065f49!important}.verifyDone:hover{background:#065f49!important}
+
+.appTopbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 18px;margin-bottom:28px;background:#fff;border:1px solid #e3e7e4;border-radius:16px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--green);font-weight:800;letter-spacing:.02em}.brandMark{width:31px;height:31px;border:2px solid var(--green);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:19px;line-height:1}.brandText{font-size:15px}
+.userTools{display:flex;align-items:center;gap:9px}.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--green);color:#fff;font-size:12px;font-weight:800;letter-spacing:.04em}.logoutBtn{padding:9px 12px}
+.dashboardHero{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 2px 18px}.dashboardHero h1{font-size:31px;line-height:1.12;margin:0;letter-spacing:-.025em}.heroSub{font-size:13px;color:#84909d;margin-top:6px}
+.clientLayout{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(560px,1.35fr);gap:28px;align-items:start}.panelHeading{font-size:21px;margin:0 0 14px;font-weight:800;letter-spacing:-.01em}
+.surfaceCard{background:#fff;border:1px solid #e1e6e2;border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.searchRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:12px}.searchRow .btn-primary{min-width:96px}
+.vendorList{display:grid;gap:14px;margin-top:16px}.vendorCard{background:#fff;border:1px solid #e1e6e2;border-radius:16px;padding:20px;box-shadow:0 7px 18px rgba(20,42,33,.045)}.vendorName{font-size:18px;font-weight:800}.vendorMeta{font-size:13px;color:#718095;margin-top:4px}.vendorCats{font-size:12px;color:#91a0b0;margin-top:5px}.vendorCard .btn-primary{padding:11px 18px;white-space:nowrap}
+.requestBox{border:1.5px solid #8ccbb6!important;box-shadow:0 8px 24px rgba(0,90,67,.08)!important}
+.ordersList{display:grid;gap:18px}.orderCard{background:#fff;border:1px solid #e1e6e2;border-radius:18px;padding:20px;box-shadow:var(--shadow)}.orderTop{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.orderTitle{font-size:18px;font-weight:800;letter-spacing:-.01em}.orderMeta{font-size:13px;color:#718095;margin-top:3px}
+.badge{padding:5px 10px;font-weight:800}.b-green{background:#def7ea;color:#006b4e}.b-blue{background:#e9f2ff;color:#1c5d9a}.b-amber{background:#fff0d7;color:#9a5500}.b-orange{background:#ffeadf;color:#a94a1a}
+.invoicePanel{margin-top:16px;background:#f7faf9;border:1px solid #dfe7e3;border-radius:15px;padding:18px;box-shadow:none}.invoiceHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.invoiceLabel{font-size:12px;color:#8896a6;letter-spacing:.04em}.invoiceNo{font-size:17px;font-weight:800;margin-top:3px}.invoiceParties{font-size:13px;color:#6f7f90;margin-top:10px}.invoiceTotals{border-top:1px solid #dfe7e3;margin-top:14px;padding-top:12px;font-size:14px}.invoiceLine{display:flex;justify-content:space-between;gap:12px;margin-top:7px}.invoiceLine.total{font-weight:800;font-size:15px;margin-top:10px}
+
+.flowDetails,.flowCard{background:#fff;border:1px solid #dfe7e3;border-radius:15px;overflow:hidden;box-shadow:none}.flowDetails{margin-top:16px}.flowSummary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;cursor:pointer;background:#fbfcfb;user-select:none}.flowSummary::-webkit-details-marker{display:none}.flowSummary:hover{background:#f3f8f5}.flowTitle{display:flex;align-items:center;gap:10px;min-width:0}.flowTitle b{font-size:15px}.flowStatus{font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:#e7f7ef;color:#006b4e;white-space:nowrap}.flowSummaryRight{display:flex;align-items:center;gap:10px;color:#5f756d;font-size:12px;font-weight:700}.flowChevron{width:26px;height:26px;border:1px solid #cfe0d9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;color:var(--green);transition:transform .2s ease}.flowDetails[open] .flowChevron{transform:rotate(180deg)}.flowBody{padding:18px 18px 16px;border-top:1px solid #e5ebe7}.flowHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.flowHeadTitle{font-size:15px;font-weight:800}.receiptBtn{background:#fff!important;color:var(--green)!important;border:1px solid #70ab95!important;box-shadow:none!important;padding:8px 11px!important;font-size:12px}.receiptBtn:hover{background:#edf7f3!important;color:#004533!important}
+.flowTimelineWrap{overflow-x:auto;padding:3px 0 6px}.flowTimeline{position:relative;display:grid;grid-template-columns:repeat(7,minmax(82px,1fr));min-width:650px;padding:0 2px}.flowTimeline:before{content:"";position:absolute;left:7%;right:7%;top:25px;height:2px;background:#cbe6db;z-index:0}.flowNode{position:relative;z-index:1;text-align:center;color:#657681;font-size:11px;font-weight:700}.flowCircle{width:50px;height:50px;margin:0 auto 7px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f5fbf8;border:1.5px solid #b9dfd0;color:#00684d}.flowCircle svg{width:21px;height:21px;stroke:currentColor}.flowNode.done .flowCircle{background:#eefaf5;border-color:#8fd2ba;color:#00684d}.flowNode.active .flowCircle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 6px 14px rgba(0,90,67,.18)}.flowNode.active{color:#00523d}.flowNode.done{color:#315e50}.flowCheck{font-size:20px;font-weight:900;line-height:1}
+.flowMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e5ebe7;margin:12px -18px -16px}.flowMetaItem{display:flex;align-items:center;gap:10px;padding:13px 18px;min-width:0}.flowMetaItem+ .flowMetaItem{border-left:1px solid #e5ebe7}.metaIcon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2faf6;color:#00684d;border:1px solid #d2eadd;flex:0 0 auto}.metaLabel{font-size:10px;color:#8997a4}.metaValue{font-size:12px;font-weight:800;color:#283641;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shipmentNote{font-size:11px;color:#718095;margin-top:10px}
+
+@media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
+@media(max-width:620px){.appTopbar{padding:12px}.brandText{display:none}.logoutBtn{display:none}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}}
+
 </style>
 <script>
 window.addEventListener("error",e=>showFatal((e.error&&e.error.stack)||e.message||"Unknown JavaScript error"));
@@ -555,16 +594,32 @@ function statusBadge(status){
 }
 function roleBadge(role){return `<span class="badge ${role}">${escapeHtml(role)}</span>`}
 
+function initials(name){
+  const parts=String(name||"User").trim().split(/\s+/).filter(Boolean);
+  return (parts.slice(0,2).map(x=>x[0]||"").join("")||"U").toUpperCase();
+}
+function flowIcon(key){
+  const icons={
+    requested:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke-width="1.8"/><path d="M14 3v5h5M10 12h5M10 16h5" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    invoiced:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14v9H9l-4 4z" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 10h6M9 13h4" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    escrow_funded:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 11l4-4 4 4 4-4 4 4-8 8z" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 7l2-2 2 2M16 7l-2-2-2 2" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    sourcing:'<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke-width="1.8"/><path d="M16 16l4 4" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    shipped:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 8l7-4 7 4-7 4zM5 8v8l7 4 7-4V8M12 12v8" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    in_transit:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" stroke-width="1.8"/><circle cx="18" cy="18" r="2" stroke-width="1.8"/></svg>',
+    completed:'<span class="flowCheck">✓</span>'
+  };
+  return icons[key]||"";
+}
+
 function renderInvoice(o,vendor,client){
   if(o.itemCost==null)return "";
-  return `<div class="card p16 mt12" style="background:#f8fafc">
-    <div class="flex between start"><div><div class="small faint">INVOICE</div><div class="mono semibold">${escapeHtml(o.invoiceNumber||"")}</div></div><div class="small faint">${displayDate(o.invoicedAt)}</div></div>
-    <div class="text14 muted mt8">Vendor: ${escapeHtml(vendor?(vendor.businessName||vendor.name):"Unknown")}</div>
-    <div class="text14 muted">Client: ${escapeHtml(client?client.name:"Unknown")}</div>
-    <div class="borderTop pt12 mt12 text14">
-      <div class="flex between"><span>Item cost</span><b>${formatNaira(o.itemCost)}</b></div>
-      <div class="flex between mt4"><span>Delivery</span><b>${formatNaira(o.deliveryCost)}</b></div>
-      <div class="flex between mt8 bold"><span>Total</span><span>${formatNaira(o.totalCost)}</span></div>
+  return `<div class="invoicePanel">
+    <div class="invoiceHead"><div><div class="invoiceLabel">INVOICE</div><div class="mono invoiceNo">${escapeHtml(o.invoiceNumber||"")}</div></div><div class="small faint">${displayDate(o.invoicedAt)}</div></div>
+    <div class="invoiceParties">Vendor: ${escapeHtml(vendor?(vendor.businessName||vendor.name):"Unknown")}<br>Client: ${escapeHtml(client?client.name:"Unknown")}</div>
+    <div class="invoiceTotals">
+      <div class="invoiceLine"><span>Item cost</span><b>${formatNaira(o.itemCost)}</b></div>
+      <div class="invoiceLine"><span>Delivery</span><b>${formatNaira(o.deliveryCost)}</b></div>
+      <div class="invoiceLine total"><span>Total</span><span>${formatNaira(o.totalCost)}</span></div>
     </div></div>`;
 }
 function renderTracking(o){
@@ -572,16 +627,26 @@ function renderTracking(o){
   const rank={requested:0,invoiced:1,escrow_funded:3,shipped:4,in_transit:5,completed:6,disputed:5,refunded:6,declined:-1,cancelled:-1};
   const labels={requested:"Request sent",invoiced:"Quote ready",escrow_funded:"Sourcing",shipped:"Shipped",in_transit:"In transit",completed:"Completed",disputed:"Disputed",refunded:"Refunded",declined:"Declined",cancelled:"Cancelled"};
   const current=rank[o.status]??0;
-  const flowBody=`<div class="flowActions"><button class="action small" onclick="printOrderReceipt('${o.id}')">Print receipt</button></div>
-    <div class="tracking">${stages.map(([k,label],i)=>{const active=(o.status==="escrow_funded"&&k==="sourcing")||o.status===k;const done=current>i||(o.status==="escrow_funded"&&i<=2);return `<div class="stage ${active?"active":done?"done":""}">${done&&!active?"✓ ":""}${label}</div>`}).join("")}</div>
-    ${o.shipment?`<div class="small muted mt12"><b>Carrier:</b> ${escapeHtml(o.shipment.carrier||"—")} &nbsp; <b>Tracking:</b> ${escapeHtml(o.shipment.tracking_number||"—")}</div>`:""}
-    ${o.shipmentProof?`<div class="small muted mt8"><b>Shipment details:</b> ${escapeHtml(o.shipmentProof)}</div>`:""}`;
+  const nodes=stages.map(([k,label],i)=>{
+    const active=(o.status==="escrow_funded"&&k==="sourcing")||o.status===k;
+    const done=current>i||(o.status==="escrow_funded"&&i<=2);
+    return `<div class="flowNode ${active?"active":done?"done":""}"><div class="flowCircle">${flowIcon(k)}</div><div>${label}</div></div>`;
+  }).join("");
+  const carrier=o.shipment&&o.shipment.carrier?o.shipment.carrier:"—";
+  const tracking=o.shipment&&o.shipment.tracking_number?o.shipment.tracking_number:"—";
+  const flowBody=`<div class="flowHead"><div class="flowHeadTitle">Track your order</div><button class="action receiptBtn" onclick="printOrderReceipt('${o.id}')">▣ &nbsp; Print receipt</button></div>
+    <div class="flowTimelineWrap"><div class="flowTimeline">${nodes}</div></div>
+    ${o.shipmentProof?`<div class="shipmentNote"><b>Shipment details:</b> ${escapeHtml(o.shipmentProof)}</div>`:""}
+    <div class="flowMeta">
+      <div class="flowMetaItem"><div class="metaIcon">◉</div><div><div class="metaLabel">Carrier</div><div class="metaValue">${escapeHtml(carrier)}</div></div></div>
+      <div class="flowMetaItem"><div class="metaIcon">◇</div><div><div class="metaLabel">Tracking</div><div class="metaValue">${escapeHtml(tracking)}</div></div></div>
+      <div class="flowMetaItem"><div class="metaIcon">□</div><div><div class="metaLabel">Item</div><div class="metaValue">${escapeHtml(o.itemDesc||"—")}</div></div></div>
+    </div>`;
 
   if(state.currentUser&&state.currentUser.role==="client"){
-    return `<details class="flowDetails mt16"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><span class="flowChevron">⌄</span></summary><div class="flowBody">${flowBody}</div></details>`;
+    return `<details class="flowDetails"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
   }
-
-  return `<div class="card p16 mt16"><div class="flex between center mb12"><b class="text14">Goods Flow</b><span class="flowStatus">${escapeHtml(labels[o.status]||o.status)}</span></div>${flowBody}</div>`;
+  return `<div class="flowCard mt16"><div class="flowBody" style="border-top:0">${flowBody}</div></div>`;
 }
 function printOrderReceipt(id){
   const o=state.orders.find(x=>x.id===id);if(!o)return;const c=userById(o.clientId),v=userById(o.vendorId);
@@ -621,12 +686,12 @@ function renderClientPanels(u){
   const vendors=state.users.filter(x=>x.role==="vendor"&&x.verified);
   const shown=state.searchResults===null?vendors:state.searchResults;
   const my=state.orders.filter(o=>o.clientId===u.id);
-  const requestBox=state.requestingVendorId?(()=>{const v=userById(state.requestingVendorId);return `<div class="card p20 mb16" style="border:2px solid #14312B"><b>Request an item from ${escapeHtml(v?(v.businessName||v.name):"vendor")}</b><form onsubmit="submitRequest(event)" class="grid mt12"><textarea id="req-item" rows="3" placeholder="Describe the exact item you want"></textarea>${state.requestError?`<div class="error">${escapeHtml(state.requestError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Send request</button><button type="button" class="action" onclick="closeRequestForm()">Close</button></div></form></div>`})():"";
-  const vendorCards=shown.length?shown.map(v=>`<div class="card p16"><div class="flex between start gap12"><div><b>${escapeHtml(v.businessName||v.name)}</b><div class="small muted">${escapeHtml(v.market||"")}</div><div class="small faint mt4">${escapeHtml(v.categories.join(", "))}</div></div><button class="btn-primary action" onclick="openRequestForm('${v.id}')">Request item</button></div></div>`).join(""):`<div class="muted text14">No matching verified vendors.</div>`;
+  const requestBox=state.requestingVendorId?(()=>{const v=userById(state.requestingVendorId);return `<div class="card p20 mb16 requestBox"><b>Request an item from ${escapeHtml(v?(v.businessName||v.name):"vendor")}</b><form onsubmit="submitRequest(event)" class="grid mt12"><textarea id="req-item" rows="3" placeholder="Describe the exact item you want"></textarea>${state.requestError?`<div class="error">${escapeHtml(state.requestError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Send request</button><button type="button" class="action" onclick="closeRequestForm()">Close</button></div></form></div>`})():"";
+  const vendorCards=shown.length?shown.map(v=>`<div class="vendorCard"><div class="flex between center gap12"><div><div class="vendorName">${escapeHtml(v.businessName||v.name)}</div><div class="vendorMeta">${escapeHtml(v.market||"")}</div><div class="vendorCats">${escapeHtml(v.categories.join(", "))}</div></div><button class="btn-primary action" onclick="openRequestForm('${v.id}')">Request item</button></div></div>`).join(""):`<div class="surfaceCard muted text14">No matching verified vendors.</div>`;
   const orders=my.length?my.map(o=>{
     const v=userById(o.vendorId),disputing=state.disputingOrderId===o.id;
     const deliveryActions=["shipped","in_transit"].includes(o.status)?`<div class="borderTop pt12 mt12">${disputing?`<form onsubmit="submitDispute(event)" class="grid"><textarea id="dispute-reason" rows="2" placeholder="Explain the problem"></textarea>${state.disputeError?`<div class="error">${escapeHtml(state.disputeError)}</div>`:""}<div class="flex gap8"><button class="redbtn action">Submit dispute</button><button type="button" class="action" onclick="closeDisputeForm()">Close</button></div></form>`:`<div class="flex gap8 wrap"><button class="btn-primary action" onclick="confirmReceipt('${o.id}')">Confirm received</button><button class="action danger" onclick="openDisputeForm('${o.id}')">Raise dispute</button></div>`}</div>`:"";
-    return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">${escapeHtml(v?(v.businessName||v.name):"Vendor")} · ${displayDate(o.createdAt)}</div></div>${statusBadge(o.status)}</div>
+    return `<div class="orderCard"><div class="orderTop"><div><div class="orderTitle">${escapeHtml(o.itemDesc)}</div><div class="orderMeta">${escapeHtml(v?(v.businessName||v.name):"Vendor")} · ${displayDate(o.createdAt)}</div></div>${statusBadge(o.status)}</div>
       ${renderInvoice(o,v,u)}
       ${["requested","invoiced"].includes(o.status)?`<button class="action danger mt12" onclick="cancelOrder('${o.id}')">Cancel order</button>`:""}
       ${o.status==="invoiced"?`<div class="warn mt12">Payment is simulated in this build.</div><button class="btn-primary action mt8" onclick="fundEscrow('${o.id}')">Simulate escrow funding</button>`:""}
@@ -636,8 +701,8 @@ function renderClientPanels(u){
       ${o.status==="refunded"?`<div class="notice mt12">Dispute resolved in the client's favour.</div>`:""}
       ${o.status==="cancelled"?`<div class="muted text14 mt12">Cancelled before escrow funding.</div>`:""}
       ${renderTracking(o)}</div>`;
-  }).join(""):`<div class="muted text14">No orders yet.</div>`;
-  return `${requestBox}<div class="grid g2"><div><div class="card p16 mb16"><b>Find a verified vendor</b><form onsubmit="runVendorSearch(event)" class="flex gap8 mt12"><input id="vendor-search" value="${escapeHtml(state.searchQuery)}" placeholder="e.g. MacBook, phone, electronics"><button class="btn-primary action">Search</button>${state.searchResults!==null?`<button type="button" class="action" onclick="clearVendorSearch()">Clear</button>`:""}</form></div><div class="grid">${vendorCards}</div></div><div><h3>My orders</h3><div class="grid">${orders}</div></div></div>`;
+  }).join(""):`<div class="surfaceCard muted text14">No orders yet.</div>`;
+  return `${requestBox}<div class="clientLayout"><div><div class="surfaceCard"><div class="panelHeading" style="font-size:17px;margin-bottom:0">Find a verified vendor</div><form onsubmit="runVendorSearch(event)" class="searchRow"><input id="vendor-search" value="${escapeHtml(state.searchQuery)}" placeholder="e.g. MacBook, phone, electronics"><button class="btn-primary action">Search</button></form>${state.searchResults!==null?`<button type="button" class="action small mt12" onclick="clearVendorSearch()">Clear search</button>`:""}</div><div class="vendorList">${vendorCards}</div></div><div class="ordersColumn"><h3 class="panelHeading">My orders</h3><div class="ordersList">${orders}</div></div></div>`;
 }
 
 function renderVendorPanels(u){
@@ -668,7 +733,12 @@ function renderAdminPanels(){
 
 function renderDashboard(){
   const u=state.currentUser;if(!u)return renderAuth();
-  return `<div><div class="flex between center mb24"><div><div class="small faint">${escapeHtml(u.role.toUpperCase())} DASHBOARD</div><h1 style="margin:4px 0">Welcome, ${escapeHtml(u.name)}</h1></div><div class="flex gap8 center">${roleBadge(u.role)}<button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button><button class="action" onclick="handleLogout()">Log out</button></div></div>${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}${u.role==="client"?renderClientPanels(u):u.role==="vendor"?renderVendorPanels(u):renderAdminPanels(u)}</div>`;
+  return `<div>
+    <div class="appTopbar"><div class="brand"><span class="brandMark">↻</span><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button><div class="avatar" title="${escapeHtml(u.name)}">${escapeHtml(initials(u.name))}</div><button class="action logoutBtn" onclick="handleLogout()">Log out</button></div></div>
+    <div class="dashboardHero"><div><h1>Welcome, ${escapeHtml(u.name)} <span aria-hidden="true">👋</span></h1><div class="heroSub">${escapeHtml(u.role.charAt(0).toUpperCase()+u.role.slice(1))} dashboard</div></div>${roleBadge(u.role)}</div>
+    ${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
+    ${u.role==="client"?renderClientPanels(u):u.role==="vendor"?renderVendorPanels(u):renderAdminPanels(u)}
+  </div>`;
 }
 function render(){
   const root=document.getElementById("root");
