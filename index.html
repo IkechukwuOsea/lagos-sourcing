@@ -60,7 +60,8 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 .flowMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e5ebe7;margin:12px -18px -16px}.flowMetaItem{display:flex;align-items:center;gap:10px;padding:13px 18px;min-width:0}.flowMetaItem+ .flowMetaItem{border-left:1px solid #e5ebe7}.metaIcon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2faf6;color:#00684d;border:1px solid #d2eadd;flex:0 0 auto}.metaLabel{font-size:10px;color:#8997a4}.metaValue{font-size:12px;font-weight:800;color:#283641;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shipmentNote{font-size:11px;color:#718095;margin-top:10px}
 
 @media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
-@media(max-width:620px){.appTopbar{padding:12px}.brandText{display:none}.logoutBtn{display:none}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}}
+@media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}}
+@media(max-width:420px){.avatar{display:none}.brandText{font-size:11px}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}}
 
 </style>
 <script>
@@ -797,7 +798,7 @@ function renderAdminPanels(){
 function renderDashboard(){
   const u=state.currentUser;if(!u)return renderAuth();
   return `<div>
-    <div class="appTopbar"><div class="brand"><span class="brandMark">↻</span><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button><div class="avatar" title="${escapeHtml(u.name)}">${escapeHtml(initials(u.name))}</div><button class="action logoutBtn" onclick="handleLogout()">Log out</button></div></div>
+    <div class="appTopbar"><div class="brand"><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button><div class="avatar" title="${escapeHtml(u.name)}">${escapeHtml(initials(u.name))}</div><button class="action logoutBtn" onclick="handleLogout()" aria-label="Log out">Log out</button></div></div>
     <div class="dashboardHero"><div><h1>Welcome, ${escapeHtml(u.name)} <span aria-hidden="true">👋</span></h1><div class="heroSub">${escapeHtml(u.role.charAt(0).toUpperCase()+u.role.slice(1))} dashboard</div></div>${roleBadge(u.role)}</div>
     ${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
     ${u.role==="client"?renderClientPanels(u):u.role==="vendor"?renderVendorPanels(u):renderAdminPanels(u)}
