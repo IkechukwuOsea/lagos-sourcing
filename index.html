@@ -59,9 +59,32 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 .flowTimelineWrap{overflow-x:auto;padding:3px 0 6px}.flowTimeline{position:relative;display:grid;grid-template-columns:repeat(7,minmax(82px,1fr));min-width:650px;padding:0 2px}.flowTimeline:before{content:"";position:absolute;left:7%;right:7%;top:25px;height:2px;background:#cbe6db;z-index:0}.flowNode{position:relative;z-index:1;text-align:center;color:#657681;font-size:11px;font-weight:700}.flowCircle{width:50px;height:50px;margin:0 auto 7px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f5fbf8;border:1.5px solid #b9dfd0;color:#00684d}.flowCircle svg{width:21px;height:21px;stroke:currentColor}.flowNode.done .flowCircle{background:#eefaf5;border-color:#8fd2ba;color:#00684d}.flowNode.active .flowCircle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 6px 14px rgba(0,90,67,.18)}.flowNode.active{color:#00523d}.flowNode.done{color:#315e50}.flowCheck{font-size:20px;font-weight:900;line-height:1}.flowNode.active.disputeState .flowCircle{background:#7f1d1d;border-color:#7f1d1d;color:#fff;box-shadow:0 6px 14px rgba(127,29,29,.18)}.flowNode.active.disputeState{color:#7f1d1d}.flowNode.active.refundState .flowCircle{background:#0f5f4b;border-color:#0f5f4b;color:#fff;box-shadow:0 6px 14px rgba(15,95,75,.18)}.flowNode.active.refundState{color:#0f5f4b}.flowNode.active.cancelState .flowCircle{background:#475569;border-color:#475569;color:#fff;box-shadow:0 6px 14px rgba(71,85,105,.18)}.flowNode.active.cancelState{color:#475569}.flowNode.active.declineState .flowCircle{background:#991b1b;border-color:#991b1b;color:#fff;box-shadow:0 6px 14px rgba(153,27,27,.18)}.flowNode.active.declineState{color:#991b1b}
 .flowMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e5ebe7;margin:12px -18px -16px}.flowMetaItem{display:flex;align-items:center;gap:10px;padding:13px 18px;min-width:0}.flowMetaItem+ .flowMetaItem{border-left:1px solid #e5ebe7}.metaIcon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2faf6;color:#00684d;border:1px solid #d2eadd;flex:0 0 auto}.metaLabel{font-size:10px;color:#8997a4}.metaValue{font-size:12px;font-weight:800;color:#283641;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shipmentNote{font-size:11px;color:#718095;margin-top:10px}
 
+/* ===== Account settings + vendor profile image ===== */
+.settingsBtn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;white-space:nowrap}
+.avatarImage{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.vendorIdentity{display:flex;align-items:center;gap:12px;min-width:0}
+.vendorThumb,.vendorThumbFallback{width:52px;height:52px;border-radius:14px;flex:0 0 52px}
+.vendorThumb{object-fit:cover;border:1px solid #d7e4de;background:#f2f7f4}
+.vendorThumbFallback{display:flex;align-items:center;justify-content:center;background:#e8f4ef;color:#005a43;border:1px solid #cce1d8;font-size:13px;font-weight:900;letter-spacing:.04em}
+.settingsOverlay{position:fixed;inset:0;z-index:1000;background:rgba(15,24,29,.48);display:flex;align-items:center;justify-content:center;padding:18px}
+.settingsModal{width:min(680px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid #dfe7e3;border-radius:20px;box-shadow:0 24px 70px rgba(10,25,20,.24);padding:22px}
+.settingsHead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}
+.settingsHead h2{margin:0;font-size:23px;letter-spacing:-.02em}
+.settingsClose{width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:11px}
+.settingsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.settingsGrid .full{grid-column:1/-1}
+.fieldLabel{display:block;font-size:12px;font-weight:800;color:#43525f;margin-bottom:6px}
+.readonlyField{background:#f4f6f5!important;color:#7a8792}
+.profileImageBox{display:flex;align-items:center;gap:15px;padding:14px;border:1px solid #dfe7e3;border-radius:14px;background:#f9fbfa}
+.profilePreview,.profilePreviewFallback{width:82px;height:82px;border-radius:17px;flex:0 0 82px}
+.profilePreview{object-fit:cover;border:1px solid #d5e2dc;background:#fff}
+.profilePreviewFallback{display:flex;align-items:center;justify-content:center;background:#e8f4ef;color:#005a43;border:1px solid #cce1d8;font-size:20px;font-weight:900}
+.imageHelp{font-size:11px;color:#718095;margin-top:6px;line-height:1.45}
+.settingsActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e6ebe8}
+
 @media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
-@media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}}
-@media(max-width:420px){.avatar{display:none}.brandText{font-size:11px}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}}
+@media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.settingsBtn{padding:8px 9px;font-size:12px}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start;flex-wrap:wrap}.vendorIdentity{flex:1 1 220px}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}.settingsGrid{grid-template-columns:1fr}.settingsGrid .full{grid-column:auto}.profileImageBox{align-items:flex-start}}
+@media(max-width:420px){.avatar{display:none}.brandText{font-size:11px}.settingsLabel{display:none}.settingsBtn{width:36px;height:36px;padding:0;justify-content:center}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}.settingsOverlay{padding:8px}.settingsModal{padding:16px;border-radius:16px}}
 
 </style>
 <script>
@@ -113,7 +136,7 @@ const firebaseConfig = {
 };
 
 const SITE_URL = "https://ikechukwuosea.github.io/lagos-sourcing/";
-const APP_VERSION = "2026.08.24.1";
+const APP_VERSION = "2026.08.24.2";
 
 const ORDER_STATUS_META = Object.freeze({
   requested:{badge:"b-slate",label:"Awaiting quote",flowLabel:"Request sent"},
@@ -141,6 +164,7 @@ let state = {
   shippingOrderId: null, shipError: "",
   disputingOrderId: null, disputeError: "",
   searchQuery: "", searchResults: null,
+  settingsOpen: false, settingsError: "", profileImageDraft: "",
   relatedByOrder: {}, relatedLoaded: new Set(), relatedLoading: new Set(), openFlowIds: new Set()
 };
 
@@ -179,6 +203,7 @@ function profileToUser(id,p){
     categories:categoriesArray(p.categories),
     verified:!!p.verified,
     phone:p.phone||"",
+    profileImage:p.profileImage||"",
     createdAt:p.createdAt||null
   };
 }
@@ -380,6 +405,7 @@ async function autoLogoutForInactivity(){
   try{await signOut(auth)}catch(e){console.warn(e)}
   clearTimeout(idleTimer);
   resetRelatedCache();
+  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";
   state.notice="You were signed out after 15 minutes of inactivity.";
@@ -433,6 +459,7 @@ async function init(){
         pendingAuthError="";
         clearTimeout(idleTimer);
         resetRelatedCache();
+        state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
         state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
         state.view="auth";
         state.loadingAction=false;
@@ -578,6 +605,7 @@ async function handleLogout(){
   clearTimeout(idleTimer);
   try{await signOut(auth)}catch(e){console.warn(e)}
   resetRelatedCache();
+  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";state.notice="";state.loadingAction=false;render();
   scheduleSensitiveFieldClear();
@@ -615,6 +643,177 @@ async function runAction(work, fallbackStateKey){
     actionLock=false;state.loadingAction=false;render();
   }
   return writeSucceeded;
+}
+
+
+function openAccountSettings(){
+  const u=state.currentUser;
+  if(!u||!["client","vendor"].includes(u.role)||state.loadingAction)return;
+  state.settingsOpen=true;
+  state.settingsError="";
+  state.profileImageDraft=u.role==="vendor"?(u.profileImage||""):"";
+  render();
+}
+
+function closeAccountSettings(){
+  if(state.loadingAction)return;
+  state.settingsOpen=false;
+  state.settingsError="";
+  state.profileImageDraft="";
+  render();
+}
+
+function renderUserAvatar(u){
+  if(u&&u.role==="vendor"&&u.profileImage){
+    return `<div class="avatar" title="${escapeHtml(u.name)}"><img class="avatarImage" src="${escapeHtml(u.profileImage)}" alt=""></div>`;
+  }
+  return `<div class="avatar" title="${escapeHtml(u?u.name:"User")}">${escapeHtml(initials(u?u.name:"User"))}</div>`;
+}
+
+function renderVendorThumb(v){
+  if(v&&v.profileImage){
+    return `<img class="vendorThumb" src="${escapeHtml(v.profileImage)}" alt="${escapeHtml((v.businessName||v.name||"Vendor")+" profile image")}">`;
+  }
+  return `<div class="vendorThumbFallback" aria-hidden="true">${escapeHtml(initials(v?(v.businessName||v.name):"Vendor"))}</div>`;
+}
+
+function readFileAsDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||""));
+    reader.onerror=()=>reject(new Error("Could not read that image."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function resizeVendorImage(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const maxDim=320;
+        const scale=Math.min(1,maxDim/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+        const width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+        const height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+        const canvas=document.createElement("canvas");
+        canvas.width=width;canvas.height=height;
+        const ctx=canvas.getContext("2d");
+        ctx.fillStyle="#ffffff";
+        ctx.fillRect(0,0,width,height);
+        ctx.drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL("image/jpeg",0.76));
+      }catch(e){reject(e)}
+    };
+    img.onerror=()=>reject(new Error("That image could not be processed."));
+    img.src=dataUrl;
+  });
+}
+
+async function handleVendorImage(event){
+  const u=state.currentUser;
+  if(!u||u.role!=="vendor")return;
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  state.settingsError="";
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+    state.settingsError="Use a JPG, PNG or WebP image.";
+    render();return;
+  }
+  if(file.size>8*1024*1024){
+    state.settingsError="Choose an image smaller than 8 MB.";
+    render();return;
+  }
+  try{
+    const source=await readFileAsDataUrl(file);
+    const resized=await resizeVendorImage(source);
+    if(resized.length>350000) throw new Error("The optimized image is still too large. Try a smaller image.");
+    state.profileImageDraft=resized;
+    render();
+  }catch(e){
+    state.settingsError=friendlyError(e);
+    render();
+  }
+}
+
+function removeVendorImage(){
+  if(!state.currentUser||state.currentUser.role!=="vendor")return;
+  state.profileImageDraft="";
+  state.settingsError="";
+  render();
+}
+
+async function saveAccountSettings(e){
+  e.preventDefault();
+  const u=state.currentUser;
+  if(!u||!["client","vendor"].includes(u.role)||state.loadingAction)return;
+  state.settingsError="";
+  const name=(document.getElementById("settings-name")?.value||"").trim();
+  const phone=(document.getElementById("settings-phone")?.value||"").trim();
+  if(!name){state.settingsError="Enter your name.";render();return}
+  if(name.length>100){state.settingsError="Keep your name under 100 characters.";render();return}
+  if(phone.length>30){state.settingsError="Keep the phone number under 30 characters.";render();return}
+
+  const updates={fullName:name,phone,updatedAt:serverTimestamp()};
+  if(u.role==="vendor"){
+    const business=(document.getElementById("settings-business")?.value||"").trim();
+    const market=(document.getElementById("settings-market")?.value||"").trim();
+    const categories=(document.getElementById("settings-categories")?.value||"").trim();
+    if(!business){state.settingsError="Enter your business name.";render();return}
+    if(business.length>120||market.length>120){state.settingsError="Business name and market must each stay under 120 characters.";render();return}
+    if(categories.length>500){state.settingsError="Keep the product categories under 500 characters.";render();return}
+    if((state.profileImageDraft||"").length>350000){state.settingsError="The vendor image is too large.";render();return}
+    updates.businessName=business;
+    updates.market=market;
+    updates.categories=categories;
+    updates.profileImage=state.profileImageDraft||"";
+  }
+
+  const saved=await runAction(async()=>{
+    await updateDoc(doc(db,"users",u.id),updates);
+  },"settingsError");
+  if(saved){
+    state.settingsOpen=false;
+    state.settingsError="";
+    state.profileImageDraft="";
+    if(!state.error) state.notice="Profile updated successfully.";
+    render();
+  }
+}
+
+function renderAccountSettings(){
+  const u=state.currentUser;
+  if(!state.settingsOpen||!u||!["client","vendor"].includes(u.role))return "";
+  const email=state.sessionUser&&state.sessionUser.email?state.sessionUser.email:"";
+  const vendorFields=u.role==="vendor"?`
+    <div class="full">
+      <label class="fieldLabel">Vendor image / logo</label>
+      <div class="profileImageBox">
+        ${state.profileImageDraft?`<img class="profilePreview" src="${escapeHtml(state.profileImageDraft)}" alt="Vendor image preview">`:`<div class="profilePreviewFallback">${escapeHtml(initials(u.businessName||u.name))}</div>`}
+        <div style="flex:1;min-width:0">
+          <input id="settings-image" type="file" accept="image/jpeg,image/png,image/webp" onchange="handleVendorImage(event)">
+          <div class="imageHelp">JPG, PNG or WebP. The app automatically resizes the image before saving it to your vendor profile.</div>
+          ${state.profileImageDraft?`<button type="button" class="action danger small mt8" onclick="removeVendorImage()">Remove image</button>`:""}
+        </div>
+      </div>
+    </div>
+    <div><label class="fieldLabel">Business name</label><input id="settings-business" maxlength="120" value="${escapeHtml(u.businessName||u.name)}" required></div>
+    <div><label class="fieldLabel">Primary market</label><input id="settings-market" maxlength="120" value="${escapeHtml(u.market||"")}" placeholder="e.g. Computer Village (Ikeja)"></div>
+    <div class="full"><label class="fieldLabel">What do you sell?</label><input id="settings-categories" maxlength="500" value="${escapeHtml(u.categories.join(", "))}" placeholder="laptops, phones, accessories"></div>`:"";
+  return `<div class="settingsOverlay" role="dialog" aria-modal="true" aria-label="Account settings">
+    <div class="settingsModal">
+      <div class="settingsHead"><div><h2>Account settings</h2><div class="small muted mt4">Edit your profile information. Your account role and verification status cannot be changed here.</div></div><button type="button" class="action settingsClose" onclick="closeAccountSettings()" aria-label="Close settings">×</button></div>
+      ${state.settingsError?`<div class="error mb16">${escapeHtml(state.settingsError)}</div>`:""}
+      <form onsubmit="saveAccountSettings(event)">
+        <div class="settingsGrid">
+          <div><label class="fieldLabel">Full name</label><input id="settings-name" maxlength="100" value="${escapeHtml(u.name)}" required></div>
+          <div><label class="fieldLabel">Phone / WhatsApp</label><input id="settings-phone" maxlength="30" type="tel" value="${escapeHtml(u.phone||"")}"></div>
+          <div class="full"><label class="fieldLabel">Login email</label><input class="readonlyField" value="${escapeHtml(email)}" readonly aria-readonly="true"><div class="imageHelp">Login email changes are not handled from this profile screen.</div></div>
+          ${vendorFields}
+        </div>
+        <div class="settingsActions"><button type="button" class="action" onclick="closeAccountSettings()" ${state.loadingAction?"disabled":""}>Cancel</button><button class="btn-primary action" ${state.loadingAction?"disabled":""}>${state.loadingAction?"Saving…":"Save changes"}</button></div>
+      </form>
+    </div>
+  </div>`;
 }
 
 async function toggleVendorVerified(id){
@@ -998,7 +1197,7 @@ function renderClientPanels(u){
   const shown=state.searchResults===null?vendors:state.searchResults;
   const my=state.orders.filter(o=>o.clientId===u.id);
   const requestBox=state.requestingVendorId?(()=>{const v=userById(state.requestingVendorId);return `<div class="card p20 mb16 requestBox"><b>Request an item from ${escapeHtml(v?(v.businessName||v.name):"vendor")}</b><form onsubmit="submitRequest(event)" class="grid mt12"><textarea id="req-item" rows="3" maxlength="1000" placeholder="Describe the exact item you want"></textarea>${state.requestError?`<div class="error">${escapeHtml(state.requestError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Send request</button><button type="button" class="action" onclick="closeRequestForm()">Close</button></div></form></div>`})():"";
-  const vendorCards=shown.length?shown.map(v=>`<div class="vendorCard"><div class="flex between center gap12"><div><div class="vendorName">${escapeHtml(v.businessName||v.name)}</div><div class="vendorMeta">${escapeHtml(v.market||"")}</div><div class="vendorCats">${escapeHtml(v.categories.join(", "))}</div></div><button class="btn-primary action" onclick="openRequestForm('${v.id}')">Request item</button></div></div>`).join(""):`<div class="surfaceCard muted text14">No matching verified vendors.</div>`;
+  const vendorCards=shown.length?shown.map(v=>`<div class="vendorCard"><div class="flex between center gap12"><div class="vendorIdentity">${renderVendorThumb(v)}<div style="min-width:0"><div class="vendorName">${escapeHtml(v.businessName||v.name)}</div><div class="vendorMeta">${escapeHtml(v.market||"")}</div><div class="vendorCats">${escapeHtml(v.categories.join(", "))}</div></div></div><button class="btn-primary action" onclick="openRequestForm('${v.id}')">Request item</button></div></div>`).join(""):`<div class="surfaceCard muted text14">No matching verified vendors.</div>`;
   const orders=my.length?my.map(o=>{
     const v=userById(o.vendorId),disputing=state.disputingOrderId===o.id;
     const deliveryActions=["shipped","in_transit"].includes(o.status)?`<div class="borderTop pt12 mt12">${disputing?`<form onsubmit="submitDispute(event)" class="grid"><textarea id="dispute-reason" rows="2" maxlength="1500" placeholder="Explain the problem"></textarea>${state.disputeError?`<div class="error">${escapeHtml(state.disputeError)}</div>`:""}<div class="flex gap8"><button class="redbtn action">Submit dispute</button><button type="button" class="action" onclick="closeDisputeForm()">Close</button></div></form>`:`<div class="flex gap8 wrap"><button class="btn-primary action" onclick="confirmReceipt('${o.id}')">Confirm received</button><button class="action danger" onclick="openDisputeForm('${o.id}')">Raise dispute</button></div>`}</div>`:"";
@@ -1045,11 +1244,12 @@ function renderAdminPanels(){
 function renderDashboard(){
   const u=state.currentUser;if(!u)return renderAuth();
   return `<div>
-    <div class="appTopbar"><div class="brand"><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button><div class="avatar" title="${escapeHtml(u.name)}">${escapeHtml(initials(u.name))}</div><button class="action logoutBtn" onclick="handleLogout()" aria-label="Log out">Log out</button></div></div>
+    <div class="appTopbar"><div class="brand"><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button>${renderUserAvatar(u)}${["client","vendor"].includes(u.role)?`<button class="action settingsBtn" onclick="openAccountSettings()" ${state.loadingAction?"disabled":""} aria-label="Account settings">⚙ <span class="settingsLabel">Settings</span></button>`:""}<button class="action logoutBtn" onclick="handleLogout()" aria-label="Log out">Log out</button></div></div>
     <div class="dashboardHero"><div><h1>Welcome, ${escapeHtml(u.name)} <span aria-hidden="true">👋</span></h1><div class="heroSub">${escapeHtml(u.role.charAt(0).toUpperCase()+u.role.slice(1))} dashboard</div></div>${roleBadge(u.role)}</div>
     ${state.notice?`<div class="notice mb16">${escapeHtml(state.notice)}</div>`:""}
     ${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
     ${u.role==="client"?renderClientPanels(u):u.role==="vendor"?renderVendorPanels(u):renderAdminPanels(u)}
+    ${renderAccountSettings()}
   </div>`;
 }
 function render(){
@@ -1065,7 +1265,8 @@ Object.assign(window,{
   toggleVendorVerified,runVendorSearch,clearVendorSearch,openRequestForm,closeRequestForm,
   submitRequest,openInvoiceForm,closeInvoiceForm,submitInvoice,declineRequest,cancelOrder,
   fundEscrow,openShipForm,closeShipForm,submitShipment,markInTransit,confirmReceipt,
-  openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt,handleFlowToggle
+  openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt,handleFlowToggle,
+  openAccountSettings,closeAccountSettings,saveAccountSettings,handleVendorImage,removeVendorImage
 });
 
 console.info(`Lagos Sourcing ${APP_VERSION}`);
