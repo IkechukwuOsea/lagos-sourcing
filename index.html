@@ -66,7 +66,6 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 .avatarSettingsTrigger:active{transform:translateY(0)}
 .avatarSettingsTrigger:focus-visible{outline:3px solid rgba(11,122,94,.24);outline-offset:3px}
 .avatarInitials{display:block;line-height:1;pointer-events:none}
-.avatarGear{position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--green);border:1px solid #b9d7cb;box-shadow:0 2px 5px rgba(20,40,31,.16);font-size:10px;line-height:1;pointer-events:none}
 .avatarImage{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .vendorIdentity{display:flex;align-items:center;gap:12px;min-width:0}
 .vendorThumb,.vendorThumbFallback{width:52px;height:52px;border-radius:14px;flex:0 0 52px}
@@ -673,7 +672,7 @@ function renderUserAvatar(u){
   const label=escapeHtml(initials(u?u.name:"User"));
   const title=escapeHtml(u?u.name:"User");
   if(u&&["client","vendor"].includes(u.role)){
-    return `<button type="button" class="avatar avatarSettingsTrigger" onclick="openAccountSettings()" ${state.loadingAction?"disabled":""} title="Account settings for ${title}" aria-label="Open account settings"><span class="avatarInitials">${label}</span><span class="avatarGear" aria-hidden="true">⚙</span></button>`;
+    return `<button type="button" class="avatar avatarSettingsTrigger" onclick="openAccountSettings()" ${state.loadingAction?"disabled":""} title="Account settings for ${title}" aria-label="Open account settings"><span class="avatarInitials">${label}</span></button>`;
   }
   return `<div class="avatar" title="${title}"><span class="avatarInitials">${label}</span></div>`;
 }
