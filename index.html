@@ -61,6 +61,12 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 
 /* ===== Account settings + vendor profile image ===== */
 .settingsBtn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;white-space:nowrap}
+.avatarSettingsTrigger{position:relative;border:0;padding:0;box-shadow:0 3px 10px rgba(0,90,67,.18);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.avatarSettingsTrigger:hover{background:#004533;transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,90,67,.24)}
+.avatarSettingsTrigger:active{transform:translateY(0)}
+.avatarSettingsTrigger:focus-visible{outline:3px solid rgba(11,122,94,.24);outline-offset:3px}
+.avatarInitials{display:block;line-height:1;pointer-events:none}
+.avatarGear{position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--green);border:1px solid #b9d7cb;box-shadow:0 2px 5px rgba(20,40,31,.16);font-size:10px;line-height:1;pointer-events:none}
 .avatarImage{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .vendorIdentity{display:flex;align-items:center;gap:12px;min-width:0}
 .vendorThumb,.vendorThumbFallback{width:52px;height:52px;border-radius:14px;flex:0 0 52px}
@@ -84,7 +90,7 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 
 @media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
 @media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.settingsBtn{padding:8px 9px;font-size:12px}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start;flex-wrap:wrap}.vendorIdentity{flex:1 1 220px}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}.settingsGrid{grid-template-columns:1fr}.settingsGrid .full{grid-column:auto}.profileImageBox{align-items:flex-start}}
-@media(max-width:420px){.avatar{display:none}.brandText{font-size:11px}.settingsLabel{display:none}.settingsBtn{width:36px;height:36px;padding:0;justify-content:center}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}.settingsOverlay{padding:8px}.settingsModal{padding:16px;border-radius:16px}}
+@media(max-width:420px){.avatar{display:flex}.brandText{font-size:11px}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}.settingsOverlay{padding:8px}.settingsModal{padding:16px;border-radius:16px}}
 
 </style>
 <script>
@@ -664,10 +670,12 @@ function closeAccountSettings(){
 }
 
 function renderUserAvatar(u){
-  if(u&&u.role==="vendor"&&u.profileImage){
-    return `<div class="avatar" title="${escapeHtml(u.name)}"><img class="avatarImage" src="${escapeHtml(u.profileImage)}" alt=""></div>`;
+  const label=escapeHtml(initials(u?u.name:"User"));
+  const title=escapeHtml(u?u.name:"User");
+  if(u&&["client","vendor"].includes(u.role)){
+    return `<button type="button" class="avatar avatarSettingsTrigger" onclick="openAccountSettings()" ${state.loadingAction?"disabled":""} title="Account settings for ${title}" aria-label="Open account settings"><span class="avatarInitials">${label}</span><span class="avatarGear" aria-hidden="true">⚙</span></button>`;
   }
-  return `<div class="avatar" title="${escapeHtml(u?u.name:"User")}">${escapeHtml(initials(u?u.name:"User"))}</div>`;
+  return `<div class="avatar" title="${title}"><span class="avatarInitials">${label}</span></div>`;
 }
 
 function renderVendorThumb(v){
@@ -1244,7 +1252,7 @@ function renderAdminPanels(){
 function renderDashboard(){
   const u=state.currentUser;if(!u)return renderAuth();
   return `<div>
-    <div class="appTopbar"><div class="brand"><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button>${renderUserAvatar(u)}${["client","vendor"].includes(u.role)?`<button class="action settingsBtn" onclick="openAccountSettings()" ${state.loadingAction?"disabled":""} aria-label="Account settings">⚙ <span class="settingsLabel">Settings</span></button>`:""}<button class="action logoutBtn" onclick="handleLogout()" aria-label="Log out">Log out</button></div></div>
+    <div class="appTopbar"><div class="brand"><span class="brandText">LAGOS SOURCING</span></div><div class="userTools"><button class="action iconbtn" onclick="refreshData()" ${state.loadingAction?"disabled":""} title="Refresh" aria-label="Refresh"><span class="${state.loadingAction?"spin":""}">↻</span></button>${renderUserAvatar(u)}<button class="action logoutBtn" onclick="handleLogout()" aria-label="Log out">Log out</button></div></div>
     <div class="dashboardHero"><div><h1>Welcome, ${escapeHtml(u.name)} <span aria-hidden="true">👋</span></h1><div class="heroSub">${escapeHtml(u.role.charAt(0).toUpperCase()+u.role.slice(1))} dashboard</div></div>${roleBadge(u.role)}</div>
     ${state.notice?`<div class="notice mb16">${escapeHtml(state.notice)}</div>`:""}
     ${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
