@@ -109,7 +109,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/fireba
 import {
   getAuth,
   setPersistence,
-  browserSessionPersistence,
+  inMemoryPersistence,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   deleteUser,
@@ -141,7 +141,7 @@ const firebaseConfig = {
 };
 
 const SITE_URL = "https://ikechukwuosea.github.io/lagos-sourcing/";
-const APP_VERSION = "2026.08.24.2";
+const APP_VERSION = "2026.08.28.1";
 
 const ORDER_STATUS_META = Object.freeze({
   requested:{badge:"b-slate",label:"Awaiting quote",flowLabel:"Request sent"},
@@ -455,7 +455,11 @@ function newProfileBootstrap(){
 
 async function init(){
   try{
-    await setPersistence(auth,browserSessionPersistence);
+    // Security policy: authentication lives only in this page instance.
+    // A refresh, reopened tab, or new browser visit must start at the login screen.
+    await setPersistence(auth,inMemoryPersistence);
+    // Clear any session left behind by an older build that used session persistence.
+    try{await signOut(auth)}catch(e){console.warn("Could not clear previous auth session",e)}
     onAuthStateChanged(auth,async user=>{
       const generation=++authGeneration;
       if(!user){
@@ -1179,7 +1183,7 @@ function renderAuth(){
   const tabs=state.authMode==="signup"?`<div class="flex gap8 mb16"><button type="button" class="${state.authRole==="client"?"btn-primary":"action"}" style="flex:1;padding:10px;border-radius:8px" onclick="switchAuthRole('client')">I'm a client</button><button type="button" class="${state.authRole==="vendor"?"btn-primary":"action"}" style="flex:1;padding:10px;border-radius:8px" onclick="switchAuthRole('vendor')">I'm a vendor</button></div>`:"";
   return `<div class="auth">
     <div class="centerText mb24"><h1>Lagos Sourcing Platform</h1><p class="muted">Shared accounts and order tracking backed by Firebase.</p></div>
-    <div class="card p20 mb16"><div class="notice"><b>Firebase connected.</b> Accounts use email/password authentication and Firestore security rules.</div><div class="warn mt12"><b>Development warning:</b> the “fund escrow” button still simulates payment. Do not use this build for real money yet.</div></div>
+    <div class="card p20 mb16"><div class="notice"><b>Firebase connected.</b> Accounts use email/password authentication and Firestore security rules.</div><div class="notice mt12"><b>Fresh login required.</b> For security, reopening or refreshing this page signs the account out and returns to the login screen.</div><div class="warn mt12"><b>Development warning:</b> the “fund escrow” button still simulates payment. Do not use this build for real money yet.</div></div>
     <div class="card p24">${tabs}
       ${state.notice?`<div class="notice mb16">${escapeHtml(state.notice)}</div>`:""}${state.error?`<div class="error mb16">${escapeHtml(state.error)}</div>`:""}
       ${state.authMode==="signup"?`
