@@ -87,8 +87,15 @@ button:disabled{opacity:.48;box-shadow:none;transform:none}
 .imageHelp{font-size:11px;color:#718095;margin-top:6px;line-height:1.45}
 .settingsActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e6ebe8}
 
-@media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}}
-@media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.settingsBtn{padding:8px 9px;font-size:12px}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start;flex-wrap:wrap}.vendorIdentity{flex:1 1 220px}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}.settingsGrid{grid-template-columns:1fr}.settingsGrid .full{grid-column:auto}.profileImageBox{align-items:flex-start}}
+
+/* ===== Order details system ===== */
+.orderSummaryCard{background:#fff;border:1px solid #e1e6e2;border-radius:17px;padding:17px 18px;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.orderSummaryCard:hover{transform:translateY(-1px);border-color:#c9d8d1;box-shadow:0 12px 30px rgba(15,35,28,.09)}
+.orderSummaryMain{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.orderSummaryTitle{font-size:16px;font-weight:800;line-height:1.3}.orderSummaryMeta{font-size:12px;color:#718095;margin-top:4px}.orderSummaryBottom{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-top:15px;padding-top:13px;border-top:1px solid #edf0ee}.orderSummaryAmount{font-size:16px;font-weight:850;color:#1e302a}.orderSummaryAmount small{display:block;font-size:10px;color:#8a98a4;font-weight:700;margin-bottom:2px}.viewOrderBtn{white-space:nowrap;padding:9px 13px!important}
+.orderDetailPage{max-width:980px;margin:0 auto}.orderDetailBack{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;background:#fff!important;color:#21342d!important;border:1px solid #d8e2dd!important;box-shadow:none!important}.orderDetailBack:hover{background:#f2f7f4!important;color:#005a43!important}.orderDetailCard{background:#fff;border:1px solid #e1e6e2;border-radius:20px;padding:22px;box-shadow:var(--shadow)}.orderDetailHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid #e8ece9}.orderDetailTitle{font-size:24px;line-height:1.2;font-weight:850;letter-spacing:-.02em;margin:0}.orderDetailSub{font-size:13px;color:#718095;margin-top:6px}.orderDetailId{font-family:Consolas,Monaco,monospace;font-size:11px;color:#82909b;margin-top:6px;word-break:break-all}.orderOverview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}.overviewItem{background:#f7faf8;border:1px solid #e4ebe7;border-radius:13px;padding:13px}.overviewLabel{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8a98a4;font-weight:800}.overviewValue{font-size:13px;color:#263831;font-weight:800;margin-top:4px;overflow-wrap:anywhere}.orderDetailSection{margin-top:20px}.orderDetailSectionTitle{font-size:14px;font-weight:850;margin:0 0 10px;color:#2c3c36}.detailActions{display:flex;gap:9px;flex-wrap:wrap}.detailMessage{margin-top:12px}.orderCompactEmpty{padding:18px;background:#fff;border:1px dashed #cad6d0;border-radius:14px;color:#718095;font-size:14px}
+
+@media(max-width:980px){.clientLayout{grid-template-columns:1fr}.ordersColumn{margin-top:2px}.max{padding:18px 16px 34px}.dashboardHero h1{font-size:27px}.orderOverview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.appTopbar{padding:10px 11px;gap:8px}.brandText{display:inline;font-size:12px;letter-spacing:.01em}.userTools{gap:6px}.iconbtn{width:36px;height:36px;font-size:20px}.avatar{width:34px;height:34px;font-size:11px}.logoutBtn{display:inline-flex;align-items:center;justify-content:center;padding:8px 9px;font-size:12px;white-space:nowrap}.settingsBtn{padding:8px 9px;font-size:12px}.dashboardHero{align-items:flex-start}.dashboardHero h1{font-size:25px}.searchRow{grid-template-columns:1fr}.searchRow .btn-primary{width:100%}.vendorCard .flex{align-items:flex-start;flex-wrap:wrap}.vendorIdentity{flex:1 1 220px}.flowMeta{grid-template-columns:1fr}.flowMetaItem+ .flowMetaItem{border-left:0;border-top:1px solid #e5ebe7}.orderCard{padding:15px}.settingsGrid{grid-template-columns:1fr}.settingsGrid .full{grid-column:auto}.profileImageBox{align-items:flex-start}.orderSummaryMain,.orderSummaryBottom,.orderDetailHeader{align-items:flex-start;flex-direction:column}.viewOrderBtn{width:100%}.orderOverview{grid-template-columns:1fr 1fr}.orderDetailCard{padding:16px}.orderDetailTitle{font-size:21px}}
 @media(max-width:420px){.avatar{display:flex}.brandText{font-size:11px}.logoutBtn{padding:8px}.max{padding-left:10px;padding-right:10px}.settingsOverlay{padding:8px}.settingsModal{padding:16px;border-radius:16px}}
 
 </style>
@@ -141,7 +148,7 @@ const firebaseConfig = {
 };
 
 const SITE_URL = "https://ikechukwuosea.github.io/lagos-sourcing/";
-const APP_VERSION = "2026.08.28.1";
+const APP_VERSION = "2026.09.13.1";
 
 const ORDER_STATUS_META = Object.freeze({
   requested:{badge:"b-slate",label:"Awaiting quote",flowLabel:"Request sent"},
@@ -170,6 +177,7 @@ let state = {
   disputingOrderId: null, disputeError: "",
   searchQuery: "", searchResults: null,
   settingsOpen: false, settingsError: "", profileImageDraft: "",
+  selectedOrderId: null,
   relatedByOrder: {}, relatedLoaded: new Set(), relatedLoading: new Set(), openFlowIds: new Set()
 };
 
@@ -332,6 +340,8 @@ function reconcileUiState(){
   }
   const validIds=new Set(state.orders.map(o=>o.id));
   state.openFlowIds=new Set([...state.openFlowIds].filter(id=>validIds.has(id)));
+  if(state.selectedOrderId&&!validIds.has(state.selectedOrderId)) state.selectedOrderId=null;
+  if(state.selectedOrderId&&state.currentUser&&!state.orders.some(o=>o.id===state.selectedOrderId&&(o.clientId===state.currentUser.id||o.vendorId===state.currentUser.id))) state.selectedOrderId=null;
 }
 
 async function loadOrderRelated(orderId,status){
@@ -410,7 +420,7 @@ async function autoLogoutForInactivity(){
   try{await signOut(auth)}catch(e){console.warn(e)}
   clearTimeout(idleTimer);
   resetRelatedCache();
-  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
+  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";state.selectedOrderId=null;
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";
   state.notice="You were signed out after 15 minutes of inactivity.";
@@ -469,7 +479,7 @@ async function init(){
         clearTimeout(idleTimer);
         resetRelatedCache();
         state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
-        state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+        state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;state.selectedOrderId=null;
         state.view="auth";
         state.loadingAction=false;
         if(authError) state.error=authError;
@@ -499,7 +509,7 @@ async function init(){
         try{await signOut(auth)}catch(signOutError){
           console.warn(signOutError);
           resetRelatedCache();
-          state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
+          state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;state.selectedOrderId=null;
           state.view="auth";state.loadingAction=false;state.error=pendingAuthError;pendingAuthError="";
           render();
         }
@@ -614,7 +624,7 @@ async function handleLogout(){
   clearTimeout(idleTimer);
   try{await signOut(auth)}catch(e){console.warn(e)}
   resetRelatedCache();
-  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";
+  state.settingsOpen=false;state.settingsError="";state.profileImageDraft="";state.selectedOrderId=null;
   state.users=[];state.orders=[];state.currentUser=null;state.sessionUser=null;
   state.view="auth";state.authMode="login";state.error="";state.notice="";state.loadingAction=false;render();
   scheduleSensitiveFieldClear();
@@ -1105,7 +1115,7 @@ function renderInvoice(o,vendor,client){
       <div class="invoiceLine total"><span>Total</span><span>${formatNaira(o.totalCost)}</span></div>
     </div></div>`;
 }
-function renderTracking(o){
+function renderTracking(o,forceExpanded=false){
   const role=state.currentUser?state.currentUser.role:"";
   const displayKey=displayStatusKey(o.status,role);
   const statusPillClass=displayKey==="disputed"?"disputeStatus":displayKey==="refunded"?"refundStatus":displayKey==="cancelled"?"cancelStatus":displayKey==="declined"?"declineStatus":"";
@@ -1142,7 +1152,7 @@ function renderTracking(o){
       <div class="flowMetaItem"><div class="metaIcon">□</div><div><div class="metaLabel">Item</div><div class="metaValue">${escapeHtml(o.itemDesc||"—")}</div></div></div>
     </div>`;
 
-  if(state.currentUser&&state.currentUser.role==="client"){
+  if(state.currentUser&&state.currentUser.role==="client"&&!forceExpanded){
     const isOpen=state.openFlowIds.has(o.id);
     return `<details class="flowDetails" ${isOpen?"open":""} ontoggle="handleFlowToggle(event,'${o.id}')"><summary class="flowSummary"><div class="flowTitle"><b>Goods Flow</b><span class="flowStatus ${statusPillClass}">${escapeHtml(displayStatusLabel(o.status,role,true))}</span></div><div class="flowSummaryRight"><span>View details</span><span class="flowChevron">⌄</span></div></summary><div class="flowBody">${flowBody}</div></details>`;
   }
@@ -1203,39 +1213,115 @@ function renderAuth(){
     </div></div>`;
 }
 
+
+function renderOrderSummary(o,counterparty){
+  const role=state.currentUser?state.currentUser.role:"";
+  const amount=o.totalCost!=null?formatNaira(o.totalCost):(o.status==="requested"?"Quote pending":"—");
+  return `<div class="orderSummaryCard">
+    <div class="orderSummaryMain"><div><div class="orderSummaryTitle">${escapeHtml(o.itemDesc||"Order")}</div><div class="orderSummaryMeta">${escapeHtml(counterparty||"")} · ${escapeHtml(displayDate(o.createdAt)||"Date unavailable")}</div></div>${statusBadge(o.status,role)}</div>
+    <div class="orderSummaryBottom"><div class="orderSummaryAmount"><small>${o.totalCost!=null?"ORDER TOTAL":"ORDER VALUE"}</small>${escapeHtml(amount)}</div><button type="button" class="btn-primary action viewOrderBtn" onclick="openOrderDetails('${o.id}')">View order →</button></div>
+  </div>`;
+}
+
+async function openOrderDetails(id){
+  if(state.loadingAction)return;
+  const o=state.orders.find(x=>x.id===id);
+  const u=state.currentUser;
+  if(!o||!u||!(o.clientId===u.id||o.vendorId===u.id))return;
+  state.selectedOrderId=id;
+  state.error="";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(["shipped","in_transit","completed","disputed","refunded"].includes(o.status)&&!state.relatedLoaded.has(id)&&!state.relatedLoading.has(id)){
+    state.relatedLoading.add(id);render();
+    try{await loadOrderRelated(id,o.status)}catch(e){state.error=friendlyError(e)}
+    state.relatedLoading.delete(id);render();
+  }
+}
+
+function closeOrderDetails(){
+  state.selectedOrderId=null;
+  state.invoicingOrderId=null;state.invoiceError="";
+  state.shippingOrderId=null;state.shipError="";
+  state.disputingOrderId=null;state.disputeError="";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderOrderDetails(o,role){
+  const c=userById(o.clientId),v=userById(o.vendorId);
+  const clientLabel=c?c.name:(o.clientName||"Client");
+  const vendorLabel=v?(v.businessName||v.name):(o.vendorName||"Vendor");
+  const counterparty=role==="client"?vendorLabel:clientLabel;
+  const counterpartyLabel=role==="client"?"Vendor":"Client";
+  const amount=o.totalCost!=null?formatNaira(o.totalCost):"Quote pending";
+  let actions="";
+  let message="";
+
+  if(role==="client"){
+    const disputing=state.disputingOrderId===o.id;
+    if(["requested","invoiced"].includes(o.status)) actions+=`<button class="action danger" onclick="cancelOrder('${o.id}')">Cancel order</button>`;
+    if(o.status==="invoiced") actions+=`<button class="btn-primary action" onclick="fundEscrow('${o.id}')">Simulate escrow funding</button>`;
+    if(["shipped","in_transit"].includes(o.status)){
+      actions+=disputing?`<form onsubmit="submitDispute(event)" class="grid" style="width:100%;max-width:620px"><textarea id="dispute-reason" rows="3" maxlength="1500" placeholder="Explain the problem"></textarea>${state.disputeError?`<div class="error">${escapeHtml(state.disputeError)}</div>`:""}<div class="detailActions"><button class="redbtn action">Submit dispute</button><button type="button" class="action" onclick="closeDisputeForm()">Close</button></div></form>`:`<button class="btn-primary action" onclick="confirmReceipt('${o.id}')">Confirm received</button><button class="action danger" onclick="openDisputeForm('${o.id}')">Raise dispute</button>`;
+    }
+    if(o.status==="requested") message=`<div class="notice detailMessage">Your request has been sent. The vendor has not quoted yet.</div>`;
+    if(o.status==="escrow_funded") message=`<div class="notice detailMessage">Escrow state recorded. The vendor can now source and ship this item.</div>`;
+    if(o.status==="disputed") message=`<div class="error detailMessage">This dispute is open and awaiting admin review.</div>`;
+    if(o.status==="refunded") message=`<div class="notice detailMessage">The dispute was resolved in your favour and this transaction is marked Refunded.</div>`;
+    if(o.status==="cancelled") message=`<div class="muted text14 detailMessage">This order was cancelled before escrow funding.</div>`;
+  }else if(role==="vendor"){
+    const invoiceOpen=state.invoicingOrderId===o.id;
+    const shipOpen=state.shippingOrderId===o.id;
+    if(o.status==="requested"){
+      actions=invoiceOpen?`<form onsubmit="submitInvoice(event)" class="grid g2" style="width:100%;max-width:680px"><div><label class="small">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0" step="0.01"></div><div><label class="small">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01"></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="detailActions" style="grid-column:1/-1"><button class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<button class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button class="action" onclick="declineRequest('${o.id}')">Decline</button>`;
+    }
+    if(o.status==="invoiced") message=`<div class="notice detailMessage">Quote sent. Waiting for the client to fund escrow.</div>`;
+    if(o.status==="escrow_funded"){
+      actions=shipOpen?`<form onsubmit="submitShipment(event)" class="grid" style="width:100%;max-width:680px"><div><label class="small">Carrier</label><input id="ship-carrier" placeholder="Courier/company"></div><div><label class="small">Tracking number</label><input id="ship-tracking" placeholder="Tracking number"></div><div><label class="small">Shipment notes</label><textarea id="ship-notes" rows="3"></textarea></div>${state.shipError?`<div class="error">${escapeHtml(state.shipError)}</div>`:""}<div class="detailActions"><button class="btn-primary action">Mark shipped</button><button type="button" class="action" onclick="closeShipForm()">Close</button></div></form>`:`<button class="btn-primary action" onclick="openShipForm('${o.id}')">Log shipment</button>`;
+      message=`<div class="notice detailMessage">Escrow state is recorded. Source the item and log shipment when it leaves you.</div>`;
+    }
+    if(o.status==="shipped") actions=`<button class="btn-primary action" onclick="markInTransit('${o.id}')">Mark in transit</button>`;
+    if(o.status==="disputed"||o.status==="refunded") message=`<div class="error detailMessage">This transaction is under/has gone through dispute review. Admin controls the resolution.</div>`;
+    if(o.status==="declined") message=`<div class="muted text14 detailMessage">You declined this sourcing request.</div>`;
+  }
+
+  return `<div class="orderDetailPage">
+    <button type="button" class="action orderDetailBack" onclick="closeOrderDetails()">← Back to orders</button>
+    <div class="orderDetailCard">
+      <div class="orderDetailHeader"><div><h2 class="orderDetailTitle">${escapeHtml(o.itemDesc||"Order details")}</h2><div class="orderDetailSub">${escapeHtml(counterpartyLabel)}: <b>${escapeHtml(counterparty)}</b></div><div class="orderDetailId">Order ID: ${escapeHtml(o.id)}</div></div>${statusBadge(o.status,role)}</div>
+      <div class="orderOverview">
+        <div class="overviewItem"><div class="overviewLabel">Order total</div><div class="overviewValue">${escapeHtml(amount)}</div></div>
+        <div class="overviewItem"><div class="overviewLabel">Created</div><div class="overviewValue">${escapeHtml(displayDateTime(o.createdAt)||"—")}</div></div>
+        <div class="overviewItem"><div class="overviewLabel">Market</div><div class="overviewValue">${escapeHtml(o.market||"—")}</div></div>
+        <div class="overviewItem"><div class="overviewLabel">Status</div><div class="overviewValue">${escapeHtml(displayStatusLabel(o.status,role,false))}</div></div>
+      </div>
+      ${o.itemCost!=null?`<div class="orderDetailSection"><h3 class="orderDetailSectionTitle">Invoice</h3>${renderInvoice(o,v,c)}</div>`:""}
+      ${(actions||message)?`<div class="orderDetailSection"><h3 class="orderDetailSectionTitle">${actions?"Available actions":"Order status"}</h3>${actions?`<div class="detailActions">${actions}</div>`:""}${message}</div>`:""}
+      <div class="orderDetailSection"><h3 class="orderDetailSectionTitle">Goods Flow</h3>${renderTracking(o,true)}</div>
+    </div>
+  </div>`;
+}
+
 function renderClientPanels(u){
+  const selected=state.selectedOrderId?state.orders.find(o=>o.id===state.selectedOrderId&&o.clientId===u.id):null;
+  if(selected)return renderOrderDetails(selected,"client");
   const vendors=state.users.filter(x=>x.role==="vendor"&&x.verified);
   const shown=state.searchResults===null?vendors:state.searchResults;
   const my=state.orders.filter(o=>o.clientId===u.id);
   const requestBox=state.requestingVendorId?(()=>{const v=userById(state.requestingVendorId);return `<div class="card p20 mb16 requestBox"><b>Request an item from ${escapeHtml(v?(v.businessName||v.name):"vendor")}</b><form onsubmit="submitRequest(event)" class="grid mt12"><textarea id="req-item" rows="3" maxlength="1000" placeholder="Describe the exact item you want"></textarea>${state.requestError?`<div class="error">${escapeHtml(state.requestError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Send request</button><button type="button" class="action" onclick="closeRequestForm()">Close</button></div></form></div>`})():"";
   const vendorCards=shown.length?shown.map(v=>`<div class="vendorCard"><div class="flex between center gap12"><div class="vendorIdentity">${renderVendorThumb(v)}<div style="min-width:0"><div class="vendorName">${escapeHtml(v.businessName||v.name)}</div><div class="vendorMeta">${escapeHtml(v.market||"")}</div><div class="vendorCats">${escapeHtml(v.categories.join(", "))}</div></div></div><button class="btn-primary action" onclick="openRequestForm('${v.id}')">Request item</button></div></div>`).join(""):`<div class="surfaceCard muted text14">No matching verified vendors.</div>`;
-  const orders=my.length?my.map(o=>{
-    const v=userById(o.vendorId),disputing=state.disputingOrderId===o.id;
-    const deliveryActions=["shipped","in_transit"].includes(o.status)?`<div class="borderTop pt12 mt12">${disputing?`<form onsubmit="submitDispute(event)" class="grid"><textarea id="dispute-reason" rows="2" maxlength="1500" placeholder="Explain the problem"></textarea>${state.disputeError?`<div class="error">${escapeHtml(state.disputeError)}</div>`:""}<div class="flex gap8"><button class="redbtn action">Submit dispute</button><button type="button" class="action" onclick="closeDisputeForm()">Close</button></div></form>`:`<div class="flex gap8 wrap"><button class="btn-primary action" onclick="confirmReceipt('${o.id}')">Confirm received</button><button class="action danger" onclick="openDisputeForm('${o.id}')">Raise dispute</button></div>`}</div>`:"";
-    return `<div class="orderCard"><div class="orderTop"><div><div class="orderTitle">${escapeHtml(o.itemDesc)}</div><div class="orderMeta">${escapeHtml(v?(v.businessName||v.name):(o.vendorName||"Vendor"))} · ${displayDate(o.createdAt)}</div></div>${statusBadge(o.status)}</div>
-      ${renderInvoice(o,v,u)}
-      ${["requested","invoiced"].includes(o.status)?`<button class="action danger mt12" onclick="cancelOrder('${o.id}')">Cancel order</button>`:""}
-      ${o.status==="invoiced"?`<div class="warn mt12">Payment is simulated in this build.</div><button class="btn-primary action mt8" onclick="fundEscrow('${o.id}')">Simulate escrow funding</button>`:""}
-      ${o.status==="escrow_funded"?`<div class="notice mt12">Escrow state recorded. Vendor can now source and ship.</div>`:""}
-      ${deliveryActions}
-      ${o.status==="disputed"?`<div class="error mt12">Dispute is open and awaiting admin review.</div>`:""}
-      ${o.status==="refunded"?`<div class="notice mt12">Dispute resolved in the client's favour.</div>`:""}
-      ${o.status==="cancelled"?`<div class="muted text14 mt12">Cancelled before escrow funding.</div>`:""}
-      ${renderTracking(o)}</div>`;
-  }).join(""):`<div class="surfaceCard muted text14">No orders yet.</div>`;
+  const orders=my.length?my.map(o=>{const v=userById(o.vendorId);return renderOrderSummary(o,v?(v.businessName||v.name):(o.vendorName||"Vendor"))}).join(""):`<div class="orderCompactEmpty">No orders yet. Find a verified vendor to start a sourcing request.</div>`;
   return `${requestBox}<div class="clientLayout"><div><div class="surfaceCard"><div class="panelHeading" style="font-size:17px;margin-bottom:0">Find a verified vendor</div><form onsubmit="runVendorSearch(event)" class="searchRow"><input id="vendor-search" value="${escapeHtml(state.searchQuery)}" placeholder="e.g. MacBook, phone, electronics"><button class="btn-primary action">Search</button></form>${state.searchResults!==null?`<button type="button" class="action small mt12" onclick="clearVendorSearch()">Clear search</button>`:""}</div><div class="vendorList">${vendorCards}</div></div><div class="ordersColumn"><h3 class="panelHeading">My orders</h3><div class="ordersList">${orders}</div></div></div>`;
 }
 
 function renderVendorPanels(u){
   if(!u.verified)return `<div class="card p24 centerText"><h3>Awaiting admin verification</h3><p class="muted">Your account works, but clients will only see your vendor profile after an admin verifies it.</p></div>`;
+  const selected=state.selectedOrderId?state.orders.find(o=>o.id===state.selectedOrderId&&o.vendorId===u.id):null;
+  if(selected)return renderOrderDetails(selected,"vendor");
   const my=state.orders.filter(o=>o.vendorId===u.id),requested=my.filter(o=>o.status==="requested"),others=my.filter(o=>o.status!=="requested");
-  const newRows=requested.length?requested.map(o=>{const c=userById(o.clientId),open=state.invoicingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">From ${escapeHtml(c?c.name:(o.clientName||"Client"))}</div></div>${statusBadge(o.status)}</div>${open?`<form onsubmit="submitInvoice(event)" class="grid g2 mt12"><div><label class="small">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0" step="0.01"></div><div><label class="small">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01"></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="flex gap8" style="grid-column:1/-1"><button class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<div class="flex gap8 mt12"><button class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button class="action" onclick="declineRequest('${o.id}')">Decline</button></div>`}</div>`}).join(""):`<div class="muted text14">No new requests.</div>`;
-  const rows=others.length?others.map(o=>{const c=userById(o.clientId),ship=state.shippingOrderId===o.id;return `<div class="card p16"><div class="flex between start"><div><b>${escapeHtml(o.itemDesc)}</b><div class="small muted">${escapeHtml(c?c.name:(o.clientName||"Client"))}</div></div>${statusBadge(o.status)}</div>${renderInvoice(o,u,c)}
-    ${o.status==="invoiced"?`<div class="muted text14 mt12">Waiting for the client to fund escrow.</div>`:""}
-    ${o.status==="escrow_funded"?(ship?`<form onsubmit="submitShipment(event)" class="grid mt12"><div><label class="small">Carrier</label><input id="ship-carrier" placeholder="Courier/company"></div><div><label class="small">Tracking number</label><input id="ship-tracking" placeholder="Tracking number"></div><div><label class="small">Shipment notes</label><textarea id="ship-notes" rows="2"></textarea></div>${state.shipError?`<div class="error">${escapeHtml(state.shipError)}</div>`:""}<div class="flex gap8"><button class="btn-primary action">Mark shipped</button><button type="button" class="action" onclick="closeShipForm()">Close</button></div></form>`:`<button class="btn-primary action mt12" onclick="openShipForm('${o.id}')">Log shipment</button>`):""}
-    ${o.status==="shipped"?`<button class="action mt12" onclick="markInTransit('${o.id}')">Mark in transit</button>`:""}
-    ${o.status==="disputed"?`<div class="error mt12">Client dispute: ${escapeHtml(o.dispute?o.dispute.reason:"")}</div>`:""}
-    ${renderTracking(o)}</div>`}).join(""):`<div class="muted text14">No quoted/active orders.</div>`;
+  const newRows=requested.length?requested.map(o=>renderOrderSummary(o,o.clientName||"Client")).join(""):`<div class="orderCompactEmpty">No new requests.</div>`;
+  const rows=others.length?others.map(o=>renderOrderSummary(o,o.clientName||"Client")).join(""):`<div class="orderCompactEmpty">No quoted or active orders.</div>`;
   return `<div class="grid g2"><div><h3>New requests</h3><div class="grid">${newRows}</div></div><div><h3>Quoted / active</h3><div class="grid">${rows}</div></div></div>`;
 }
 
@@ -1277,7 +1363,8 @@ Object.assign(window,{
   submitRequest,openInvoiceForm,closeInvoiceForm,submitInvoice,declineRequest,cancelOrder,
   fundEscrow,openShipForm,closeShipForm,submitShipment,markInTransit,confirmReceipt,
   openDisputeForm,closeDisputeForm,submitDispute,resolveDispute,printOrderReceipt,handleFlowToggle,
-  openAccountSettings,closeAccountSettings,saveAccountSettings,handleVendorImage,removeVendorImage
+  openAccountSettings,closeAccountSettings,saveAccountSettings,handleVendorImage,removeVendorImage,
+  openOrderDetails,closeOrderDetails
 });
 
 console.info(`Lagos Sourcing ${APP_VERSION}`);
