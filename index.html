@@ -124,7 +124,7 @@ function showFatal(message){const b=document.getElementById("startup-error"),m=d
 </script>
 </head>
 <body>
-<main id="root" class="max" tabindex="-1"><div class="card p24"><h1>Lagos Sourcing Platform</h1><p class="muted"><b>Connecting to the backend…</b></p></div></main>
+<main id="root" class="max" tabindex="-1"><div class="card p24"><h1>Lagos Sourcing Platform</h1><p class="muted" role="status" aria-live="polite"><b>Connecting to the backend…</b></p></div></main>
 <div id="startup-error" role="alert" style="display:none;max-width:1050px;margin:16px auto;padding:16px;border:1px solid #fca5a5;background:#fef2f2;color:#7f1d1d;border-radius:12px">
 <strong>The app hit an error:</strong><pre id="startup-error-message" style="white-space:pre-wrap"></pre></div>
 
@@ -729,9 +729,10 @@ document.addEventListener("keydown",event=>{
   if(event.key!=="Tab")return;
   const modal=document.querySelector(".settingsModal");
   if(!modal)return;
-  const focusable=[...modal.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
+  const focusable=[...modal.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.getClientRects().length>0);
   if(!focusable.length){event.preventDefault();modal.focus();return;}
   const first=focusable[0],last=focusable[focusable.length-1];
+  if(!modal.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();return;}
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 });
@@ -878,7 +879,7 @@ function renderAccountSettings(){
   return `<div class="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-description" onclick="if(event.target===this)closeAccountSettings()">
     <div class="settingsModal" tabindex="-1">
       <div class="settingsHead"><div><h2 id="settings-title">Account settings</h2><div class="small muted mt4" id="settings-description">Edit your profile information. Your account role and verification status cannot be changed here.</div></div><button type="button" class="action settingsClose" onclick="closeAccountSettings()" aria-label="Close settings">×</button></div>
-      ${state.settingsError?`<div class="error mb16">${escapeHtml(state.settingsError)}</div>`:""}
+      ${state.settingsError?`<div class="error mb16" role="alert" aria-live="assertive">${escapeHtml(state.settingsError)}</div>`:""}
       <form onsubmit="saveAccountSettings(event)">
         <div class="settingsGrid">
           <div><label class="fieldLabel" for="settings-name">Full name</label><input id="settings-name" data-settings-autofocus maxlength="100" value="${escapeHtml(u.name)}" required></div>
@@ -1329,7 +1330,7 @@ function renderOrderDetails(o,role){
     const invoiceOpen=state.invoicingOrderId===o.id;
     const shipOpen=state.shippingOrderId===o.id;
     if(o.status==="requested"){
-      actions=invoiceOpen?`<form onsubmit="submitInvoice(event)" class="grid g2" style="width:100%;max-width:680px"><div><label class="small" for="inv-item-cost">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0" step="0.01"></div><div><label class="small" for="inv-delivery-cost">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01"></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="detailActions" style="grid-column:1/-1"><button type="submit" class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<button type="button" class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button type="button" class="action" onclick="declineRequest('${o.id}')">Decline</button>`;
+      actions=invoiceOpen?`<form onsubmit="submitInvoice(event)" class="grid g2" style="width:100%;max-width:680px"><div><label class="small" for="inv-item-cost">Item cost (₦)</label><input id="inv-item-cost" type="number" min="0.01" step="0.01" required></div><div><label class="small" for="inv-delivery-cost">Delivery (₦)</label><input id="inv-delivery-cost" type="number" min="0" step="0.01" required></div>${state.invoiceError?`<div class="error" style="grid-column:1/-1">${escapeHtml(state.invoiceError)}</div>`:""}<div class="detailActions" style="grid-column:1/-1"><button type="submit" class="btn-primary action">Generate invoice</button><button type="button" class="action" onclick="closeInvoiceForm()">Close</button></div></form>`:`<button type="button" class="btn-primary action" onclick="openInvoiceForm('${o.id}')">Quote & invoice</button><button type="button" class="action" onclick="declineRequest('${o.id}')">Decline</button>`;
     }
     if(o.status==="invoiced") message=`<div class="notice detailMessage">Quote sent. Waiting for the client to fund escrow.</div>`;
     if(o.status==="escrow_funded"){
@@ -1407,7 +1408,7 @@ function renderDashboard(){
 function render(){
   document.body.classList.toggle("modal-open",Boolean(state.settingsOpen));
   const root=document.getElementById("root");
-  if(state.view==="loading")root.innerHTML=`<div class="card p24">Connecting to the backend…</div>`;
+  if(state.view==="loading")root.innerHTML=`<div class="card p24" role="status" aria-live="polite">Connecting to the backend…</div>`;
   else if(state.view==="auth"){root.innerHTML=renderAuth();scheduleSensitiveFieldClear();}
   else root.innerHTML=renderDashboard();
 }
